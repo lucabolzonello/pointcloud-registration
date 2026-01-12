@@ -19,7 +19,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Default build type
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
-endif()
+endif ()
 
 # =========================
 # Options
@@ -37,6 +37,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 # Include Sanitization flags
 include(Sanitizers)
 include(CompilerWarnings)
+include(FetchDependencies)
 
 
 # =========================
@@ -64,8 +65,7 @@ target_include_directories(pcr
         $<INSTALL_INTERFACE:include>
 )
 
-
-
+# Set compilation warnings
 set_project_warnings(pcr)
 
 # =========================
@@ -78,19 +78,21 @@ add_subdirectory(apps/pcr_cli)
 # =========================
 if (PCR_BUILD_EXAMPLES)
     add_subdirectory(examples)
-endif()
+endif ()
 
 # =========================
 # Tests
 # =========================
 if (PCR_BUILD_TESTS)
+    # Enable CTest for this directory and below
     enable_testing()
+
     add_subdirectory(tests)
-endif()
+endif ()
 
 # =========================
 # Benchmarks
 # =========================
 if (PCR_BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
-endif()
+endif ()
