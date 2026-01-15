@@ -53,3 +53,34 @@ TEMPLATE_LIST_TEST_CASE("Point coordinates can be modified", "[member access]",
     CHECK(p1.z == new_z_value);
   }
 }
+
+TEMPLATE_LIST_TEST_CASE("Operator== overload works", "[equivalency overload]",
+                        test_types) {
+  auto x_value = static_cast<TestType>(1);
+  auto y_value = static_cast<TestType>(2);
+  auto z_value = static_cast<TestType>(3);
+
+  SECTION("Points equivalent") {
+
+    pcr::core::Point<TestType> p1(x_value, y_value, z_value);
+    pcr::core::Point<TestType> p2(x_value, y_value, z_value);
+  }
+
+  SECTION("Different X value") {
+
+    pcr::core::Point<TestType> p1(x_value, y_value, z_value);
+    pcr::core::Point<TestType> p2(y_value, y_value, z_value);
+  }
+
+  SECTION("Different Y value") {
+
+    pcr::core::Point<TestType> p1(x_value, y_value, z_value);
+    pcr::core::Point<TestType> p2(x_value, z_value, z_value);
+  }
+
+  SECTION("Different Z value") {
+
+    pcr::core::Point<TestType> p1(x_value, y_value, z_value);
+    pcr::core::Point<TestType> p2(x_value, y_value, x_value);
+  }
+}
