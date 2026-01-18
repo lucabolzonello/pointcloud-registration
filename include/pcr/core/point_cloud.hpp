@@ -7,6 +7,10 @@
 
 namespace pcr::core {
 
+/*
+PointCloud. A class for representing a 3D PointCloud in point cloud registration
+applications.
+*/
 class PointCloud {
 public:
   // The data type of every coordinate in the PointCloud
