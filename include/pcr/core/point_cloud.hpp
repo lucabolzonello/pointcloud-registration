@@ -52,10 +52,12 @@ public:
 
   // begin(), returns iterator to beginning element
   [[nodiscard]] point_iterator begin();
+  [[nodiscard]] const_point_iterator begin() const;
   [[nodiscard]] const_point_iterator cbegin() const;
 
   // end(), returns the past-the-end iterator
   [[nodiscard]] point_iterator end();
+  [[nodiscard]] const_point_iterator end() const;
   [[nodiscard]] const_point_iterator cend() const;
 
 private:

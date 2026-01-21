@@ -20,14 +20,19 @@ void PointCloud::add(point_type p) { m_points.push_back(p); }
 
 // begin(), returns iterator to beginning element
 PointCloud::point_iterator PointCloud::begin() { return m_points.begin(); }
+PointCloud::const_point_iterator PointCloud::begin() const {
+  return m_points.begin();
+}
 PointCloud::const_point_iterator PointCloud::cbegin() const {
   return m_points.cbegin();
 }
 
 // end(), returns the past-the-end iterator
 PointCloud::point_iterator PointCloud::end() { return m_points.end(); }
+PointCloud::const_point_iterator PointCloud::end() const {
+  return m_points.end();
+}
 PointCloud::const_point_iterator PointCloud::cend() const {
   return m_points.cend();
 }
-
 } // namespace pcr::core
