@@ -6,6 +6,68 @@
 
 namespace pcr::io::ply {
 
+// This implementation is largely based on the example.cpp code file given in
+// the tinyply repository, it has simply been modified to present a
+// simplified API for my use case
+pcr::core::PointCloud read_file(const std::string &path_to_file) {
+
+  std::unique_ptr<std::istream> file_stream;
+  std::vector<uint8_t> byte_buffer;
+
+  // For most files < 1gb, preloading the entire file upfront into memory
+  // and wrapping it into a stream is a net win for parsing speed (~30-40%
+  // faster)
+  byte_buffer = tinyply_utils::read_file_binary(path_to_file);
+  file_stream.reset(new tinyply_utils::memory_stream((char *)byte_buffer.data(),
+                                                     byte_buffer.size()));
+
+  if (!file_stream || file_stream->fail())
+    throw std::runtime_error("file_stream failed to open " + path_to_file);
+
+  // Initialize PlyFile object and parse header
+  tinyply::PlyFile file;
+  file.parse_header(*file_stream);
+
+  // Read vertices
+  std::shared_ptr<tinyply::PlyData> vertices;
+  vertices = file.request_properties_from_element("vertex", {"x", "y", "z"});
+  file.read(*file_stream);
+
+  // Check that vertex types are all 32 bit floats (My current decision is
+  // to only support 32 bit floats, not really a deep meaning behind this
+  // decision,  I just don't want to write the code to handle other types)
+  if (vertices->t != tinyply::Type::FLOAT32)
+    throw std::runtime_error(
+        "Vertices in the ply file are of type other that is not a 32-bit "
+        "float. The current implementation of the \".ply\"  reader currently "
+        "only supports the reading float types");
+
+  // Simple conversion into a point cloud, could be optimized further by
+  // copying straight into the PointCloud instead of using the vector as
+  // intermediary buffer, but for simplicities’ sake will keep it this
+  // way. Worth optimize in future if reading ".ply" files is a
+  // bottleneck. Major complication is that I am unable to safely
+  // reinterpret_cast the byte array vertices.data() into a float array
+  // due to alignment complications
+  const size_t num_vertices_bytes = vertices->buffer.size_bytes();
+  const size_t num_vertices = vertices->count;
+
+  std::vector<tinyply_utils::float3> vertices_tmp_buf(num_vertices);
+  std::memcpy(vertices_tmp_buf.data(), vertices->buffer.get(),
+              num_vertices_bytes);
+
+  // Declare PointCloud and reserve memory ahead of time
+  pcr::core::PointCloud result_pointcloud;
+  result_pointcloud.reserve(num_vertices);
+
+  // Transfer into result_pointcloud
+  for (const auto &point_obj : vertices_tmp_buf) {
+    result_pointcloud.add(
+        pcr::core::Point{point_obj.x, point_obj.y, point_obj.z});
+  }
+
+  return result_pointcloud;
+}
 
 // This implementation is largely based on the example.cpp code file given in
 // the tinyply repository, it has simply been modified to present a
