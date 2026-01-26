@@ -1,5 +1,5 @@
-#ifndef SPATIAL_INDEX_HPP
-#define SPATIAL_INDEX_HPP
+#ifndef KD_TREE_HPP
+#define KD_TREE_HPP
 
 #include <cstddef>
 #include <type_traits>
@@ -10,23 +10,23 @@
 
 namespace pcr::spatial {
 
-class SpatialIndex {
+class KdTree {
 public:
   using point_type = core::PointCloud::point_type;
   using coordinate_value_type = core::PointCloud::coordinate_value_type;
 
-  // SpatialIndex() , automatically uses Point.x, Point.y,
+  // KdTree() , automatically uses Point.x, Point.y,
   // Point.z as the Pointer to Member dimensions for indexing
-  SpatialIndex();
+  KdTree();
 
-  // SpatialIndex(dimensions), takes a vector of Pointer to Member's
+  // KdTree(dimensions), takes a vector of Pointer to Member's
   // within the Point class as the dimensions for indexing
-  SpatialIndex(
+  KdTree(
       const std::vector<core::PointCloud::coordinate_value_type point_type::*>
           dimensions);
 
   // build_index(cloud)
-  // Note: It is assumed that the cloud must outlive this SpatialIndex
+  // Note: It is assumed that the cloud must outlive this KdTree
   // object, undefined behaviour if caller doesn't follow this guideline
   void build_index(const core::PointCloud &cloud);
 
