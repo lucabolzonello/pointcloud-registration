@@ -52,7 +52,7 @@ target_sources(pcr
 
         src/linalg/svd.cpp
 
-        src/spatial/nearest_neighbour.cpp
+        src/spatial/kd_tree.cpp
 
         src/registration/icp.cpp
 
