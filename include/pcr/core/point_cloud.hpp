@@ -33,7 +33,8 @@ public:
   // Time Complexity: O(1)
   template <typename Iterator>
   PointCloud(Iterator const begin, Iterator const end)
-      : m_bounding_box{0, 0, 0, 0, 0, 0}, data(end - begin) {
+      : m_bounding_box{0, 0, 0, 0, 0, 0}, data() {
+    data.reserve(end - begin);
     for (Iterator point = begin; point != end; ++point) {
       this->add(*point);
     }
