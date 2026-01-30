@@ -315,3 +315,65 @@ TEST_CASE("Bounding Box functionality works correctly", "[bounding_box]") {
     CHECK_THAT(bbox3.max_z, Catch::Matchers::WithinRel(100.0f));
   }
 }
+
+TEST_CASE("Subscripting operator", "[subscript_op]") {
+  pcr::core::Point<point_value_type> p1(static_cast<point_value_type>(1.5),
+                                        static_cast<point_value_type>(2.5),
+                                        static_cast<point_value_type>(3.5));
+  pcr::core::Point<point_value_type> p2(static_cast<point_value_type>(60.5),
+                                        static_cast<point_value_type>(80.5),
+                                        static_cast<point_value_type>(0.5));
+  pcr::core::Point<point_value_type> p3(static_cast<point_value_type>(0.0),
+                                        static_cast<point_value_type>(0.0),
+                                        static_cast<point_value_type>(0.0));
+
+  SECTION("Access first element") {
+    pcr::core::PointCloud pc{};
+    pc.add(p1);
+    pc.add(p2);
+    pc.add(p3);
+
+    CHECK(pc[0] == p1);
+  }
+
+  SECTION("Access middle element") {
+    pcr::core::PointCloud pc{};
+    pc.add(p1);
+    pc.add(p2);
+    pc.add(p3);
+
+    CHECK(pc[1] == p2);
+  }
+
+  SECTION("Access last element") {
+    pcr::core::PointCloud pc{};
+    pc.add(p1);
+    pc.add(p2);
+    pc.add(p3);
+
+    CHECK(pc[2] == p3);
+  }
+
+  SECTION("Const access works correctly") {
+    std::array<pcr::core::Point<point_value_type>, 3> points{p1, p2, p3};
+    const pcr::core::PointCloud pc(points.begin(), points.end());
+
+    CHECK(pc[0] == p1);
+    CHECK(pc[1] == p2);
+    CHECK(pc[2] == p3);
+  }
+
+  SECTION("Modify element through subscript operator") {
+    pcr::core::PointCloud pc{};
+    pc.add(p1);
+
+    pcr::core::Point<point_value_type> p_new(
+        static_cast<point_value_type>(99.9),
+        static_cast<point_value_type>(88.8),
+        static_cast<point_value_type>(77.7));
+    pc[0] = p_new;
+
+    CHECK(pc[0] == p_new);
+    CHECK_FALSE(pc[0] == p1);
+  }
+}
