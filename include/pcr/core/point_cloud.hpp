@@ -85,11 +85,15 @@ public:
 
   // operator[](index), overload for the subscripting operator
   // Time Complexity: O(1)
-  [[nodiscard]] point_type &operator[](size_t index);
+  [[nodiscard]] inline point_type &operator[](size_t index) {
+    return data[index];
+  }
 
   // const operator[](index), const overload for the subscripting operator
   // Time Complexity: O(1)
-  [[nodiscard]] const point_type &operator[](size_t index) const;
+  [[nodiscard]] inline const point_type &operator[](size_t index) const {
+    return data[index];
+  }
 
 private:
   // Bounding box stats
