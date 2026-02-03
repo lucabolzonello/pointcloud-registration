@@ -21,9 +21,7 @@ public:
 
   // KdTree(dimensions), takes a vector of Pointer to Member's
   // within the Point class as the dimensions for indexing
-  KdTree(
-      const std::vector<core::PointCloud::coordinate_value_type point_type::*>
-          dimensions);
+  KdTree(const std::vector<coordinate_value_type point_type::*> &dimensions);
 
   // build_index(cloud)
   // Note: It is assumed that the cloud must outlive this KdTree
@@ -45,6 +43,11 @@ public:
       const core::PointCloud::point_type &query_point,
       coordinate_value_type radius, std::vector<size_t> &out_indices,
       std::vector<coordinate_value_type> &out_distances_squared) const;
+
+private:
+
+  // Tree stored as a vector, must ensure I build tree in fully balanced fashion
+  std::vector<KdTreeNode> tree;
 };
 
 } // namespace pcr::spatial
