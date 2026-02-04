@@ -6,6 +6,15 @@
 #include "pcr/core/point.hpp"
 #include "pcr/core/point_cloud.hpp"
 
+// are_points_equal(), compare points by value of x,y,z coordinates
+// Note: This is just for unit testing purposes, due to float rounding
+// complications it is inappropriate to use in actual computations.
+template <typename T>
+bool are_points_equal(const pcr::core::Point<T> &lhs,
+                      const pcr::core::Point<T> &rhs) {
+  return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+}
+
 using point_value_type = float;
 
 TEST_CASE("Default initialize PointCloud", "[constructor]") {
@@ -183,7 +192,7 @@ TEST_CASE("begin(), works correctly", "[begin]") {
     pc.add(p2);
 
     CHECK(pc.begin() != pc.end());
-    CHECK(*pc.begin() == p1);
+    CHECK(are_points_equal(*pc.begin(), p1));
   }
 }
 
@@ -333,7 +342,7 @@ TEST_CASE("Subscripting operator", "[subscript_op]") {
     pc.add(p2);
     pc.add(p3);
 
-    CHECK(pc[0] == p1);
+    CHECK(are_points_equal(pc[0], p1));
   }
 
   SECTION("Access middle element") {
@@ -342,7 +351,7 @@ TEST_CASE("Subscripting operator", "[subscript_op]") {
     pc.add(p2);
     pc.add(p3);
 
-    CHECK(pc[1] == p2);
+    CHECK(are_points_equal(pc[1], p2));
   }
 
   SECTION("Access last element") {
@@ -351,16 +360,16 @@ TEST_CASE("Subscripting operator", "[subscript_op]") {
     pc.add(p2);
     pc.add(p3);
 
-    CHECK(pc[2] == p3);
+    CHECK(are_points_equal(pc[2], p3));
   }
 
   SECTION("Const access works correctly") {
     std::array<pcr::core::Point<point_value_type>, 3> points{p1, p2, p3};
     const pcr::core::PointCloud pc(points.begin(), points.end());
 
-    CHECK(pc[0] == p1);
-    CHECK(pc[1] == p2);
-    CHECK(pc[2] == p3);
+    CHECK(are_points_equal(pc[0], p1));
+    CHECK(are_points_equal(pc[1], p2));
+    CHECK(are_points_equal(pc[2], p3));
   }
 
   SECTION("Modify element through subscript operator") {
@@ -373,7 +382,7 @@ TEST_CASE("Subscripting operator", "[subscript_op]") {
         static_cast<point_value_type>(77.7));
     pc[0] = p_new;
 
-    CHECK(pc[0] == p_new);
-    CHECK_FALSE(pc[0] == p1);
+    CHECK(are_points_equal(pc[0], p_new));
+    CHECK_FALSE(are_points_equal(pc[1], p1));
   }
 }

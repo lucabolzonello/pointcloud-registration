@@ -27,12 +27,6 @@ public:
       : x(x_), y(y_), z(z_) {}
 };
 
-// Operator== overload, compare points by value of x,y,z coordinates
-template <typename PointType>
-bool operator==(const PointType &lhs, const PointType &rhs) {
-  return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
-}
-
 }; // namespace pcr::core
 
 #endif
