@@ -13,6 +13,10 @@
 #include "pcr/core/point.hpp"
 #include "pcr/core/point_cloud.hpp"
 
+/**
+ * @namespace pcr::spatial
+ * @brief Core data structures for spatial storage and querying
+ */
 namespace pcr::spatial {
 
 /**
