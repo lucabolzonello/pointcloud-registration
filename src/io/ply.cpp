@@ -6,11 +6,10 @@
 
 namespace pcr::io::ply {
 
-// This implementation is largely based on the example.cpp code file given in
-// the tinyply repository, it has simply been modified to present a
-// simplified API for my use case
 pcr::core::PointCloud read_file(const std::string &path_to_file) {
-
+  // This implementation is largely inspired by the example.cpp code file given
+  // in the tinyply repository, it has simply been modified to present a
+  // simplified API for my use case
   std::unique_ptr<std::istream> file_stream;
   std::vector<uint8_t> byte_buffer;
 
@@ -69,13 +68,11 @@ pcr::core::PointCloud read_file(const std::string &path_to_file) {
   return result_pointcloud;
 }
 
-// This implementation is largely based on the example.cpp code file given in
-// the tinyply repository, it has simply been modified to present a
-// simplified API for my use case
 void write_file(const std::string &path_to_file,
                 const core::PointCloud &src_point_cloud, const bool binary) {
-
-  // Initialize outstream
+  // This implementation is largely inspired by the example.cpp code file given
+  // in the tinyply repository, it has  been modified to present a simplified
+  // API for my use case Initialize outstream
   std::filebuf fb;
   binary ? fb.open(path_to_file + ".ply", std::ios::out | std::ios::binary)
          : fb.open(path_to_file + ".ply", std::ios::out);
