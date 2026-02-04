@@ -1,3 +1,8 @@
+/**
+ * @file point_cloud.hpp
+ * @brief Point cloud container with integrated spatial metadata
+ */
+
 #ifndef POINT_CLOUD_HPP
 #define POINT_CLOUD_HPP
 
@@ -7,30 +12,46 @@
 #include <cstddef>
 #include <vector>
 
+/**
+ * @namespace pcr::core
+ * @brief Core data structures for point cloud registration
+ */
 namespace pcr::core {
 
-/*
-PointCloud. A class for representing a 3D PointCloud in point cloud registration
-applications.
-*/
+/**
+ * @brief Container for 3D point cloud data
+ *
+ * Manages and owns a collection of 3D points with integrated bounding box
+ * maintenance.
+ */
 class PointCloud {
-
 public:
-  // The data type of every coordinate in the PointCloud
-  using coordinate_value_type = float;
+  using coordinate_value_type = float; ///< Data type for all coordinates
+  using point_type =
+      Point<coordinate_value_type>; ///< Point type used internally
+  using point_iterator =
+      std::vector<point_type>::iterator; ///< Mutable iterator type
+  using const_point_iterator =
+      std::vector<point_type>::const_iterator; ///< Const iterator type
 
-  using point_type = Point<coordinate_value_type>;
-
-  using point_iterator = std::vector<point_type>::iterator;
-
-  using const_point_iterator = std::vector<point_type>::const_iterator;
-
-  // Default Constructor
-  // TimeComplexity:O(1)
+  /**
+   * @brief Default constructor - creates empty point cloud
+   *
+   * Time Complexity: O(1)
+   */
   PointCloud();
 
-  // PointCloud(Iterator), Construct from given iterator, leaves source intact
-  // Time Complexity: O(1)
+  /**
+   * @brief Construct from iterator range
+   *
+   * Creates point cloud from all points in [begin, end).
+   *
+   * Time Complexity: O(n) where n = distance(begin, end)
+   *
+   * @tparam Iterator Input iterator type that yields point_type
+   * @param begin Iterator to first point
+   * @param end Iterator one past last point
+   */
   template <typename Iterator>
   PointCloud(Iterator const begin, Iterator const end)
       : m_bounding_box(), data() {
@@ -40,26 +61,59 @@ public:
     }
   }
 
-  // size(), returns number of points in point cloud
-  // Time Complexity: O(1)
+  /**
+   * @brief Get number of points in cloud
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Number of points currently stored
+   */
   [[nodiscard]] std::size_t size() const noexcept;
 
-  // reserve(), reserve memory for the n points to be stored in point cloud.
-  // Slightly breaks abstraction but is crucial for efficiency.
-  // Time Complexity: O(1)
+  /**
+   * @brief Reserve memory for n points
+   *
+   * Pre-allocates storage to avoid reallocation during incremental
+   * point addition. Does not change size().
+   *
+   * Time Complexity: O(n) if reallocation needed
+   *
+   * @param n Number of points to reserve space for
+   */
   void reserve(std::size_t n);
 
-  // is_empty(), returns true if there are no points in the point cloud
-  // Time Complexity: O(1)
+  /**
+   * @brief Check if point cloud is empty
+   *
+   * Time Complexity: O(1)
+   *
+   * @return true if cloud contains no points, false otherwise
+   */
   [[nodiscard]] bool is_empty() const noexcept;
 
-  // add(), add a point to the point cloud, and updates PointCloud metadata
-  // Time Complexity: O(n) worst case, O(1) amortized
+  /**
+   * @brief Add a single point to the cloud
+   *
+   * Appends point and updates bounding box metadata.
+   *
+   * Time Complexity: O(1) amortized, O(n) worst case if reallocation needed
+   *
+   * @param p Point to add
+   */
   void add(point_type p);
 
-  // add(Iterator), add points from given iterator to the point cloud, leaves
-  // source intact
-  // Time Complexity: O(n) worst case, O(n) amortized
+  /**
+   * @brief Add points from iterator range
+   *
+   * Adds all points in [begin, end) to the cloud.
+   * Source container remains unchanged.
+   *
+   * Time Complexity: O(n) amortized where n = distance(begin, end)
+   *
+   * @tparam Iterator Input iterator type yielding point_type
+   * @param begin Iterator to first point
+   * @param end Iterator one past last point
+   */
   template <typename Iterator>
   void add(Iterator const begin, Iterator const end) {
     for (Iterator point = begin; point != end; ++point) {
@@ -67,40 +121,104 @@ public:
     }
   }
 
-  // begin(), returns iterator to beginning element
-  // Time Complexity: O(1)
+  /**
+   * @brief Get iterator to first point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Iterator to beginning of point sequence
+   */
   [[nodiscard]] point_iterator begin();
+
+  /**
+   * @brief Get const iterator to first point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Const iterator to beginning of point sequence
+   */
   [[nodiscard]] const_point_iterator begin() const;
+
+  /**
+   * @brief Get const iterator to first point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Const iterator to beginning of point sequence
+   */
   [[nodiscard]] const_point_iterator cbegin() const;
 
-  // end(), returns the past-the-end iterator
-  // Time Complexity: O(1)
+  /**
+   * @brief Get iterator to one past last point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Iterator to end of point sequence
+   */
   [[nodiscard]] point_iterator end();
+
+  /**
+   * @brief Get const iterator to one past last point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Const iterator to end of point sequence
+   */
   [[nodiscard]] const_point_iterator end() const;
+
+  /**
+   * @brief Get const iterator to one past last point
+   *
+   * Time Complexity: O(1)
+   *
+   * @return Const iterator to end of point sequence
+   */
   [[nodiscard]] const_point_iterator cend() const;
 
-  // get_bounding_box(), returns a copy of the BoundingBox for the PointCloud
-  // Time Complexity: O(1)
+  /**
+   * @brief Get copy of current bounding box
+   *
+   * Time Complexity: O(1)
+   *
+   * @return BoundingBox encompassing all points in cloud
+   */
   [[nodiscard]] BoundingBox<coordinate_value_type> get_bounding_box() const;
 
-  // operator[](index), overload for the subscripting operator
-  // Time Complexity: O(1)
+  /**
+   * @brief Access point by index
+   *
+   * Time Complexity: O(1)
+   *
+   * @param index Zero-based point index
+   * @return Reference to point at specified index
+   *
+   * @warning No bounds checking for efficiency reasons, undefined behavior if
+   * index >= size()
+   */
   [[nodiscard]] inline point_type &operator[](size_t index) {
     return data[index];
   }
 
-  // const operator[](index), const overload for the subscripting operator
-  // Time Complexity: O(1)
+  /**
+   * @brief Access point by index (const version)
+   *
+   * Time Complexity: O(1)
+   *
+   * @param index Zero-based point index
+   * @return Const reference to point at specified index
+   *
+   * @warning No bounds checking for efficiency reasons, undefined behavior if
+   * index >= size()
+   */
   [[nodiscard]] inline const point_type &operator[](size_t index) const {
     return data[index];
   }
 
 private:
-  // Bounding box stats
-  BoundingBox<coordinate_value_type> m_bounding_box;
-  std::vector<point_type> data;
+  BoundingBox<coordinate_value_type> m_bounding_box; ///< Spatial Bounding Box
+  std::vector<point_type> data;                      ///< Point storage
 };
 
 } // namespace pcr::core
 
-#endif
+#endif // POINT_CLOUD_HPP
