@@ -8,11 +8,21 @@
 TEST_CASE("PLY write/read round-trip preserves points", "[ply]") {
   pcr::core::PointCloud cloud;
 
-  cloud.add({1.0f, 2.0f, 3.0f});
-  cloud.add({-1.5f, 0.0f, 4.2f});
-  cloud.add({10.0f, 20.0f, 30.0f});
-  cloud.add({-10.5f, 65.2f, 32.1f});
-  cloud.add({-10.3f, 65.2f, 32.1f});
+  cloud.add({static_cast<pcr::coord_t>(1.0), static_cast<pcr::coord_t>(2.0),
+             static_cast<pcr::coord_t>(3.0)});
+
+  cloud.add({static_cast<pcr::coord_t>(-1.5), static_cast<pcr::coord_t>(0.0),
+             static_cast<pcr::coord_t>(4.2)});
+
+  cloud.add({static_cast<pcr::coord_t>(10.0), static_cast<pcr::coord_t>(20.0),
+             static_cast<pcr::coord_t>(30.0)});
+
+  cloud.add({static_cast<pcr::coord_t>(-10.5), static_cast<pcr::coord_t>(65.2),
+             static_cast<pcr::coord_t>(32.1)});
+
+  cloud.add({static_cast<pcr::coord_t>(-10.3), static_cast<pcr::coord_t>(65.2),
+             static_cast<pcr::coord_t>(32.1)});
+
   const auto path = std::filesystem::temp_directory_path() / "pcr_test_cloud";
 
   SECTION("Binary PLY") {

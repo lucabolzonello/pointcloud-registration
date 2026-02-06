@@ -82,7 +82,7 @@ void write_file(const std::string &path_to_file,
 
   // Pack points from src_point_cloud into a flat vertex_buffer of x,y,z coords
   // to be passed to tinyply
-  std::vector<core::PointCloud::coordinate_value_type> vertex_buffer;
+  std::vector<pcr::coord_t> vertex_buffer;
   vertex_buffer.reserve(src_point_cloud.size() * 3);
   for (const auto &point : src_point_cloud) {
     vertex_buffer.push_back(point.x);
