@@ -9,14 +9,19 @@
 // Helper to create a simple test cloud
 pcr::core::PointCloud create_test_cloud() {
   pcr::core::PointCloud cloud;
-  cloud.add({0.0f, 0.0f, 0.0f});
-  cloud.add({1.0f, 0.0f, 0.0f});
-  cloud.add({10.0f, 10.0f, 10.0f});
+  cloud.add({static_cast<pcr::coord_t>(0.0), static_cast<pcr::coord_t>(0.0),
+             static_cast<pcr::coord_t>(0.0)});
+  cloud.add({static_cast<pcr::coord_t>(1.0), static_cast<pcr::coord_t>(0.0),
+             static_cast<pcr::coord_t>(0.0)});
+  cloud.add({static_cast<pcr::coord_t>(10.0), static_cast<pcr::coord_t>(10.0),
+             static_cast<pcr::coord_t>(10.0)});
   return cloud;
 }
 
+
+using point_type = pcr::point_t;
+
 TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
-  using point_type = pcr::core::Point<float>;
 
   SECTION("Default constructor functions") {
     pcr::spatial::KdTree tree;
@@ -25,8 +30,8 @@ TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
   }
 
   SECTION("Parametrized constructor with custom dimensions)") {
-    std::vector<pcr::core::PointCloud::coordinate_value_type point_type::*>
-        dims = {&point_type::x, &point_type::y};
+    std::vector<pcr::coord_t point_type::*> dims = {&point_type::x,
+                                                    &point_type::y};
     REQUIRE_NOTHROW(pcr::spatial::KdTree(dims));
   }
 }
@@ -36,9 +41,11 @@ TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
   pcr::core::PointCloud empty_cloud;
   tree.build_index(empty_cloud);
 
-  pcr::core::Point<float> query{1.0f, 1.0f, 1.0f};
-  std::vector<size_t> indices;
-  std::vector<float> dists;
+  point_type query{static_cast<pcr::coord_t>(1.0),
+                   static_cast<pcr::coord_t>(1.0),
+                   static_cast<pcr::coord_t>(1.0)};
+  std::vector<pcr::point_idx> indices;
+  std::vector<pcr::dist_t> dists;
 
   SECTION("KNN on empty tree returns nothing") {
     tree.knn_search(query, 5, indices, dists);
@@ -47,7 +54,7 @@ TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
   }
 
   SECTION("Radius search on empty tree returns nothing") {
-    tree.radius_search(query, 10.0f, indices, dists);
+    tree.radius_search(query, static_cast<pcr::dist_t>(10.0), indices, dists);
     CHECK(indices.empty());
   }
 }
@@ -57,20 +64,24 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
   auto cloud = create_test_cloud();
   tree.build_index(cloud);
 
-  std::vector<size_t> indices;
-  std::vector<float> dists;
+  std::vector<pcr::point_idx> indices;
+  std::vector<pcr::dist_t> dists;
 
   SECTION("K=1 finds the exact point if it exists") {
-    pcr::core::Point<float> query{10.0f, 10.0f, 10.0f}; // Matches point tree 2
+    point_type query{static_cast<pcr::coord_t>(10.0),
+                     static_cast<pcr::coord_t>(10.0),
+                     static_cast<pcr::coord_t>(10.0)}; // Matches point tree 2
     tree.knn_search(query, 1, indices, dists);
 
     REQUIRE(indices.size() == 1);
     CHECK(indices[0] == 2);
-    CHECK(dists[0] == Catch::Approx(0.0f));
+    CHECK(dists[0] == Catch::Approx(static_cast<pcr::coord_t>(0.0)));
   }
 
   SECTION("K=2 finds multiple points in order of distance") {
-    pcr::core::Point<float> query{0.1f, 0.0f, 0.0f};
+    point_type query{static_cast<pcr::coord_t>(0.1),
+                     static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0)};
     tree.knn_search(query, 2, indices, dists);
 
     REQUIRE(indices.size() == 2);
@@ -80,7 +91,9 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
   }
 
   SECTION("Requesting K > total points returns all points available") {
-    pcr::core::Point<float> query{0.0f, 0.0f, 0.0f};
+    point_type query{static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0)};
     tree.knn_search(query, 100, indices, dists);
     CHECK(indices.size() == cloud.size());
   }
@@ -91,12 +104,14 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
   auto cloud = create_test_cloud();
   tree.build_index(cloud);
 
-  std::vector<size_t> indices;
-  std::vector<float> dists;
+  std::vector<pcr::point_idx> indices;
+  std::vector<pcr::dist_t> dists;
 
   SECTION("Small radius finds only the closest point") {
-    pcr::core::Point<float> query{0.1f, 0.0f, 0.0f};
-    float radius = 0.5f; // Should only catch origin
+    point_type query{static_cast<pcr::coord_t>(0.1),
+                     static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0)};
+    pcr::dist_t radius = 0.5; // Should only catch origin
     tree.radius_search(query, radius, indices, dists);
 
     CHECK(indices.size() == 1);
@@ -104,21 +119,25 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
   }
 
   SECTION("Large radius finds all points") {
-    pcr::core::Point<float> query{0.0f, 0.0f, 0.0f};
-    float radius = 100.0f;
+    point_type query{static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0)};
+    pcr::dist_t radius = 100.0;
     tree.radius_search(query, radius, indices, dists);
 
     CHECK(indices.size() == cloud.size());
   }
 
   SECTION("Distances returned are squared") {
-    pcr::core::Point<float> query{5.0f, 0.0f, 0.0f};
-    tree.radius_search(query, 10.0f, indices, dists);
+    point_type query{static_cast<pcr::coord_t>(5.0),
+                     static_cast<pcr::coord_t>(0.0),
+                     static_cast<pcr::coord_t>(0.0)};
+    tree.radius_search(query, static_cast<pcr::dist_t>(10.0), indices, dists);
 
     // Point {0,0,0} is distance 5 away. Squared distance should be 25.
     auto it = std::find(indices.begin(), indices.end(), 0);
     REQUIRE(it != indices.end());
     auto found_idx = static_cast<size_t>(std::distance(indices.begin(), it));
-    CHECK(dists[found_idx] == Catch::Approx(25.0f));
+    CHECK(dists[found_idx] == Catch::Approx(25.0));
   }
 }
