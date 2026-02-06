@@ -7,6 +7,7 @@
 #define POINT_CLOUD_HPP
 
 #include "bounding_box.hpp"
+#include "pcr/prelude.hpp"
 #include "point.hpp"
 
 #include <cstddef>
@@ -26,13 +27,10 @@ namespace pcr::core {
  */
 class PointCloud {
 public:
-  using coordinate_value_type = float; ///< Data type for all coordinates
-  using point_type =
-      Point<coordinate_value_type>; ///< Point type used internally
   using point_iterator =
-      std::vector<point_type>::iterator; ///< Mutable iterator type
+      std::vector<pcr::point_t>::iterator; ///< Mutable iterator type
   using const_point_iterator =
-      std::vector<point_type>::const_iterator; ///< Const iterator type
+      std::vector<pcr::point_t>::const_iterator; ///< Const iterator type
 
   /**
    * @brief Default constructor - creates empty point cloud
@@ -100,7 +98,7 @@ public:
    *
    * @param p Point to add
    */
-  void add(point_type p);
+  void add(pcr::point_t p);
 
   /**
    * @brief Add points from iterator range
@@ -182,7 +180,7 @@ public:
    *
    * @return BoundingBox encompassing all points in cloud
    */
-  [[nodiscard]] BoundingBox<coordinate_value_type> get_bounding_box() const;
+  [[nodiscard]] BoundingBox<pcr::coord_t> get_bounding_box() const;
 
   /**
    * @brief Access point by index
@@ -195,7 +193,7 @@ public:
    * @warning No bounds checking for efficiency reasons, undefined behavior if
    * index >= size()
    */
-  [[nodiscard]] inline point_type &operator[](size_t index) {
+  [[nodiscard]] inline pcr::point_t &operator[](size_t index) {
     return data[index];
   }
 
@@ -210,13 +208,13 @@ public:
    * @warning No bounds checking for efficiency reasons, undefined behavior if
    * index >= size()
    */
-  [[nodiscard]] inline const point_type &operator[](size_t index) const {
+  [[nodiscard]] inline const pcr::point_t &operator[](size_t index) const {
     return data[index];
   }
 
 private:
-  BoundingBox<coordinate_value_type> m_bounding_box; ///< Spatial Bounding Box
-  std::vector<point_type> data;                      ///< Point storage
+  BoundingBox<pcr::coord_t> m_bounding_box; ///< Spatial Bounding Box
+  std::vector<pcr::point_t> data;           ///< Point storage
 };
 
 } // namespace pcr::core

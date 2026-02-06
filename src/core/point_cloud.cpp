@@ -10,7 +10,7 @@ void PointCloud::reserve(std::size_t n) { data.reserve(n); }
 
 bool PointCloud::is_empty() const noexcept { return this->size() == 0; }
 
-void PointCloud::add(point_type p) {
+void PointCloud::add(pcr::point_t p) {
   // update bounding_box
   if (p.x < m_bounding_box.min_x)
     m_bounding_box.min_x = p.x;
@@ -54,8 +54,7 @@ PointCloud::const_point_iterator PointCloud::cend() const {
   return data.cend();
 }
 
-[[nodiscard]] BoundingBox<PointCloud::coordinate_value_type>
-PointCloud::get_bounding_box() const {
+[[nodiscard]] BoundingBox<pcr::coord_t> PointCloud::get_bounding_box() const {
   return m_bounding_box;
 }
 

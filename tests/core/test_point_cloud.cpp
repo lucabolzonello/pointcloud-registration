@@ -5,6 +5,7 @@
 
 #include "pcr/core/point.hpp"
 #include "pcr/core/point_cloud.hpp"
+#include "pcr/prelude.hpp"
 
 // are_points_equal(), compare points by value of x,y,z coordinates
 // Note: This is just for unit testing purposes, due to float rounding
@@ -15,7 +16,7 @@ bool are_points_equal(const pcr::core::Point<T> &lhs,
   return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
 }
 
-using point_value_type = float;
+using point_value_type = pcr::coord_t;
 
 TEST_CASE("Default initialize PointCloud", "[constructor]") {
   pcr::core::PointCloud pc{};
