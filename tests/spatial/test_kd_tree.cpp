@@ -26,7 +26,7 @@ TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
   SECTION("Default constructor functions") {
     pcr::spatial::KdTree tree;
     pcr::core::PointCloud cloud = create_test_cloud();
-    REQUIRE_NOTHROW(tree.build_index(cloud));
+    REQUIRE_NOTHROW(tree.build_index(&cloud));
   }
 
   SECTION("Parametrized constructor with custom dimensions)") {
@@ -39,7 +39,7 @@ TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
 TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
   pcr::spatial::KdTree tree;
   pcr::core::PointCloud empty_cloud;
-  tree.build_index(empty_cloud);
+  tree.build_index(&empty_cloud);
 
   point_type query{static_cast<pcr::coord_t>(1.0),
                    static_cast<pcr::coord_t>(1.0),
@@ -62,7 +62,7 @@ TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
 TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
   pcr::spatial::KdTree tree;
   auto cloud = create_test_cloud();
-  tree.build_index(cloud);
+  tree.build_index(&cloud);
 
   std::vector<pcr::point_idx> indices;
   std::vector<pcr::dist_t> dists;
@@ -102,7 +102,7 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
 TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
   pcr::spatial::KdTree tree;
   auto cloud = create_test_cloud();
-  tree.build_index(cloud);
+  tree.build_index(&cloud);
 
   std::vector<pcr::point_idx> indices;
   std::vector<pcr::dist_t> dists;

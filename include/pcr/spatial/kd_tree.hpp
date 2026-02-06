@@ -73,7 +73,7 @@ public:
    * @warning Points in the cloud will be reordered
    * @note Multiple build_index() calls will rebuild the tree
    */
-  void build_index(core::PointCloud &cloud);
+  void build_index(core::PointCloud *cloud);
 
   /**
    * @brief Find k nearest neighbors to query point
@@ -126,13 +126,17 @@ private:
   /**
    * @brief Dimensions to use for splitting (defaults to x, y, z)
    */
-  const std::vector<pcr::coord_t pcr::point_t::*> m_dimensions = {
-      &pcr::point_t::x, &pcr::point_t::y, &pcr::point_t::z};
+  const std::vector<pcr::coord_t pcr::point_t::*> m_dimensions;
 
   /**
    * @brief Tree stored as flat array
    */
   std::vector<KdTreeNode> tree;
+
+  /**
+   * @brief Raw pointer to the input point cloud
+   */
+  pcr::core::PointCloud *m_point_cloud;
 
   /**
    * @brief Recursive helper for building tree
@@ -145,11 +149,8 @@ private:
    * @param tree_idx Index in tree array where this node should be stored
    * @param split_plane Current dimension to split along
    */
-  void build_index_rec(pcr::core::PointCloud &cloud, long left, long right,
-                       long tree_idx, uint8_t split_plane);
-  void build_index_rec(pcr::core::PointCloud &cloud, pcr::point_idx left,
-                       pcr::point_idx right, pcr::point_idx tree_idx,
-                       uint8_t split_plane);
+  void build_index_rec(pcr::point_idx left, pcr::point_idx right,
+                       pcr::point_idx tree_idx, uint8_t split_plane);
 
 };
 

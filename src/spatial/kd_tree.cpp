@@ -3,28 +3,32 @@
 #include "pcr/spatial/kd_tree.hpp"
 
 namespace pcr::spatial {
-KdTree::KdTree() = default;
+KdTree::KdTree()
+    : m_dimensions{&pcr::point_t::x, &pcr::point_t::y, &pcr::point_t::z},
+      m_point_cloud(nullptr) {}
 
 pcr::spatial::KdTree::KdTree(
     const std::vector<pcr::coord_t pcr::point_t::*> &dimensions)
-    : m_dimensions(dimensions) {
+    : m_dimensions(dimensions), m_point_cloud(nullptr) {
   if (m_dimensions.empty() or m_dimensions.size() > 255) {
     throw std::runtime_error(
         "The KDTree must be indexed over  0 < K <= 255 dimensions");
   }
 }
 
-void KdTree::build_index(pcr::core::PointCloud &cloud) {
+void KdTree::build_index(pcr::core::PointCloud *cloud) {
+  // Set m_point_cloud to point to the point_cloud
+  m_point_cloud = cloud;
+
   // reserve capacity in tree ahead of time to prevent repeated resizes
-  tree.reserve(cloud.size());
+  tree.reserve(m_point_cloud->size());
 
   // Recursively build index
-  build_index_rec(cloud, 0, cloud.size(), 0, 0);
+  build_index_rec(0, cloud->size(), 0, 0);
 }
 
-void KdTree::build_index_rec(pcr::core::PointCloud &cloud, pcr::point_idx left,
-                             pcr::point_idx right, pcr::point_idx tree_idx,
-                             uint8_t split_plane) {
+void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
+                             pcr::point_idx tree_idx, uint8_t split_plane) {
 
   pcr::point_idx num_elements = right - left;
 
@@ -41,8 +45,9 @@ void KdTree::build_index_rec(pcr::core::PointCloud &cloud, pcr::point_idx left,
   pcr::point_idx midpoint = left + num_elements / 2;
 
   // call nth_element to find the median and place it at midpoint_it
-  std::nth_element(cloud.begin() + left, cloud.begin() + midpoint,
-                   cloud.begin() + right,
+  std::nth_element(m_point_cloud->begin() + left,
+                   m_point_cloud->begin() + midpoint,
+                   m_point_cloud->begin() + right,
                    [&split_plane, this](const auto &lhs, const auto &rhs) {
                      return lhs.*(m_dimensions[split_plane]) <
                             rhs.*(m_dimensions[split_plane]);
@@ -55,10 +60,10 @@ void KdTree::build_index_rec(pcr::core::PointCloud &cloud, pcr::point_idx left,
   split_plane = (split_plane + 1) % m_dimensions.size();
 
   // Recurse left side
-  build_index_rec(cloud, left, midpoint, 2 * tree_idx + 1, split_plane);
+  build_index_rec(left, midpoint, 2 * tree_idx + 1, split_plane);
 
   // Recurse right side
-  build_index_rec(cloud, midpoint + 1, right, 2 * tree_idx + 2, split_plane);
+  build_index_rec(midpoint + 1, right, 2 * tree_idx + 2, split_plane);
 }
 
 void KdTree::knn_search(const pcr::point_t &query_point, pcr::point_idx k,
