@@ -37,7 +37,7 @@ void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
     return;
   }
   if (num_elements == 1) {
-    tree[tree_idx] = {cloud[left].*(m_dimensions[split_plane]), split_plane};
+    tree[tree_idx] = {left, split_plane};
     return;
   }
 
@@ -54,7 +54,7 @@ void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
                    });
 
   // Add midpoint to tree, this is the split node
-  tree[tree_idx] = {cloud[midpoint].*(m_dimensions[split_plane]), split_plane};
+  tree[tree_idx] = {midpoint, split_plane};
 
   // increment split_plane
   split_plane = (split_plane + 1) % m_dimensions.size();

@@ -27,8 +27,8 @@ namespace pcr::spatial {
  * Each node stores the splitting plane and float value.
  */
 struct KdTreeNode {
-  float split_value;   ///< Coordinate value at which to split (4 bytes)
-  uint8_t split_plane; ///< Dimension index to split on (1 byte)
+  pcr::point_idx point_cloud_idx; ///< Point cloud index of point (4 bytes)
+  uint8_t split_plane;            ///< Dimension index to split on (1 byte)
 }; // 8 byte aligned
 
 /**
