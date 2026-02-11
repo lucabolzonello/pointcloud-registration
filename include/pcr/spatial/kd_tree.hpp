@@ -185,6 +185,53 @@ private:
     return (curr_node_idx - 1) / 2;
   }
 
+  //  /**
+  //   * @brief Checks if current node is a leaf node
+  //   *
+  //   * @param curr_node_idx Index of current node
+  //   * @return Boolean indicating whether it is a leaf node
+  //   */
+  //  [[nodiscard]] static inline bool is_leaf_node(pcr::point_idx
+  //  curr_node_idx) {
+  //    // TO DO: Precompute (tree.size()/2 + 1) during build_index() to
+  //    // avoid having to recompute each time
+  //    return curr_idx >= (tree.size() / 2 + 1);
+  //  }
+  //
+  /**
+   * @brief Gets the squared euclidean distance between two points
+   *
+   * @param p1 First point
+   * @param p2 Second point
+   * @return squared euclidean distance between two points
+   */
+  [[nodiscard]] static inline pcr::dist_t
+  get_dist_squared(const pcr::point_t &p1, const pcr::point_t &p2) {
+    pcr::dist_t x_diff = p1.x - p2.x;
+    pcr::dist_t y_diff = p1.y - p2.y;
+    pcr::dist_t z_diff = p1.z - p2.z;
+
+    pcr::dist_t dist_squared =
+        (x_diff * x_diff) + (y_diff * y_diff) + (z_diff * z_diff);
+    return dist_squared;
+  }
+
+  /**
+   * @brief Check if point is within radius of query point
+   *
+   * Fast distance test using squared Euclidean distance.
+   *
+   * @param p1 First point
+   * @param p2 Second point
+   * @param radius_squared Squared search radius
+   * @return true if distance(p1, p2)^2 < radius_squared
+   */
+  [[nodiscard]] static inline bool in_radius(const pcr::point_t &p1,
+                                             const pcr::point_t &p2,
+                                             pcr::dist_t radius_squared) {
+
+    return get_dist_squared(p1, p2) < radius_squared;
+  }
 };
 
 } // namespace pcr::spatial
