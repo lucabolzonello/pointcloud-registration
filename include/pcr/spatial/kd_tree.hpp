@@ -152,6 +152,39 @@ private:
   void build_index_rec(pcr::point_idx left, pcr::point_idx right,
                        pcr::point_idx tree_idx, uint8_t split_plane);
 
+  /**
+   * @brief Get index of left child node
+   *
+   * @param curr_node_idx Index of current node
+   * @return Index of left child in tree array
+   */
+  [[nodiscard]] static inline pcr::point_idx
+  left_node(pcr::point_idx curr_node_idx) {
+    return 2 * curr_node_idx + 1;
+  }
+
+  /**
+   * @brief Get index of right child node
+   *
+   * @param curr_node_idx Index of current node
+   * @return Index of right child in tree array
+   */
+  [[nodiscard]] static inline pcr::point_idx
+  right_node(pcr::point_idx curr_node_idx) {
+    return 2 * curr_node_idx + 2;
+  }
+
+  /**
+   * @brief Get index of parent node
+   *
+   * @param curr_node_idx Index of current node
+   * @return Index of parent in tree array
+   */
+  [[nodiscard]] static inline pcr::point_idx
+  parent_node(pcr::point_idx curr_node_idx) {
+    return (curr_node_idx - 1) / 2;
+  }
+
 };
 
 } // namespace pcr::spatial
