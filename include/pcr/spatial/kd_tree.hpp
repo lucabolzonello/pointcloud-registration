@@ -124,11 +124,6 @@ public:
 
 private:
   /**
-   * @brief Dimensions to use for splitting (defaults to x, y, z)
-   */
-  const std::vector<pcr::coord_t pcr::point_t::*> m_dimensions;
-
-  /**
    * @brief Tree stored as flat array
    */
   std::vector<KdTreeNode> tree;
@@ -151,6 +146,29 @@ private:
    */
   void build_index_rec(pcr::point_idx left, pcr::point_idx right,
                        pcr::point_idx tree_idx, uint8_t split_plane);
+
+  /**
+   * @brief Helper for getting the points coordinate value along the split
+   * dimension
+   *
+   *
+   *
+   * @param query_point Reference to point
+   * @param split_dimension Integer representing the split dimension
+   */
+  [[nodiscard]] static inline pcr::coord_t
+  split_val(const pcr::point_t &query_point, uint8_t split_dimension) {
+    switch (split_dimension) {
+    case 0:
+      return query_point.x;
+
+    case 1:
+      return query_point.y;
+
+    default:
+      return query_point.z;
+    }
+  }
 
   /**
    * @brief Get index of left child node

@@ -3,18 +3,8 @@
 #include "pcr/spatial/kd_tree.hpp"
 
 namespace pcr::spatial {
-KdTree::KdTree()
-    : m_dimensions{&pcr::point_t::x, &pcr::point_t::y, &pcr::point_t::z},
-      m_point_cloud(nullptr) {}
 
-pcr::spatial::KdTree::KdTree(
-    const std::vector<pcr::coord_t pcr::point_t::*> &dimensions)
-    : m_dimensions(dimensions), m_point_cloud(nullptr) {
-  if (m_dimensions.empty() or m_dimensions.size() > 255) {
-    throw std::runtime_error(
-        "The KDTree must be indexed over  0 < K <= 255 dimensions");
-  }
-}
+KdTree::KdTree() : m_point_cloud(nullptr) {}
 
 void KdTree::build_index(pcr::core::PointCloud *cloud) {
   // Set m_point_cloud to point to the point_cloud
@@ -45,19 +35,18 @@ void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
   pcr::point_idx midpoint = left + num_elements / 2;
 
   // call nth_element to find the median and place it at midpoint_it
-  std::nth_element(m_point_cloud->begin() + left,
-                   m_point_cloud->begin() + midpoint,
-                   m_point_cloud->begin() + right,
-                   [&split_plane, this](const auto &lhs, const auto &rhs) {
-                     return lhs.*(m_dimensions[split_plane]) <
-                            rhs.*(m_dimensions[split_plane]);
-                   });
+  std::nth_element(
+      m_point_cloud->begin() + left, m_point_cloud->begin() + midpoint,
+      m_point_cloud->begin() + right,
+      [&split_plane, this](const auto &lhs, const auto &rhs) {
+        return split_val(lhs, split_plane) < split_val(rhs, split_plane);
+      });
 
   // Add midpoint to tree, this is the split node
   tree[tree_idx] = {midpoint, split_plane};
 
   // increment split_plane
-  split_plane = (split_plane + 1) % m_dimensions.size();
+  split_plane = (split_plane + 1) % 3;
 
   // Recurse left side
   build_index_rec(left, midpoint, 2 * tree_idx + 1, split_plane);

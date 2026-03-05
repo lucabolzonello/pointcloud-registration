@@ -28,12 +28,6 @@ TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
     pcr::core::PointCloud cloud = create_test_cloud();
     REQUIRE_NOTHROW(tree.build_index(&cloud));
   }
-
-  SECTION("Parametrized constructor with custom dimensions)") {
-    std::vector<pcr::coord_t point_type::*> dims = {&point_type::x,
-                                                    &point_type::y};
-    REQUIRE_NOTHROW(pcr::spatial::KdTree(dims));
-  }
 }
 
 TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
