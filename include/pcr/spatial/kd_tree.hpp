@@ -21,15 +21,25 @@
 namespace pcr::spatial {
 
 /**
- * @brief Node in the k-d tree structure
+ * @brief Item in the priority queue used in the KNN-Search
  *
- * Compact kd-tree node
- * Each node stores the splitting plane and float value.
+ * Each node stores the squared_distance and the point_idx of the associated
+ * point.
  */
-struct KdTreeNode {
-  pcr::point_idx point_cloud_idx; ///< Point cloud index of point (4 bytes)
-  uint8_t split_plane;            ///< Dimension index to split on (1 byte)
-}; // 8 byte aligned
+struct PriorityQueueItem {
+  /**
+   * @brief Construct with the specified values
+   *
+   * @param point_cloud_idx Point cloud index of point
+   * @param dist_squared squared distance between point and query point
+   */
+  PriorityQueueItem(pcr::point_idx point_cloud_idx, pcr::dist_t dist_squared)
+      : m_point_cloud_idx(point_cloud_idx), m_dist_squared(dist_squared) {}
+
+  pcr::point_idx m_point_cloud_idx; ///< Point cloud index of point (4 bytes)
+  pcr::dist_t m_dist_squared; ///<  Squared distance between point and query
+                              ///<  point (4 bytes)
+};
 
 /**
  * @brief K-d tree spatial index for fast nearest neighbor search
@@ -123,11 +133,6 @@ public:
                      std::vector<pcr::dist_t> &out_distances_squared) const;
 
 private:
-  /**
-   * @brief Tree stored as flat array
-   */
-  std::vector<KdTreeNode> tree;
-
   /**
    * @brief Raw pointer to the input point cloud
    */

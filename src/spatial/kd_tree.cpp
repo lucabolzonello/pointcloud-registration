@@ -10,9 +10,6 @@ void KdTree::build_index(pcr::core::PointCloud *cloud) {
   // Set m_point_cloud to point to the point_cloud
   m_point_cloud = cloud;
 
-  // reserve capacity in tree ahead of time to prevent repeated resizes
-  tree.reserve(m_point_cloud->size());
-
   // Recursively build index
   build_index_rec(0, cloud->size(), 0, 0);
 }
@@ -27,7 +24,6 @@ void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
     return;
   }
   if (num_elements == 1) {
-    tree[tree_idx] = {left, split_plane};
     return;
   }
 
@@ -41,9 +37,6 @@ void KdTree::build_index_rec(pcr::point_idx left, pcr::point_idx right,
       [&split_plane, this](const auto &lhs, const auto &rhs) {
         return split_val(lhs, split_plane) < split_val(rhs, split_plane);
       });
-
-  // Add midpoint to tree, this is the split node
-  tree[tree_idx] = {midpoint, split_plane};
 
   // increment split_plane
   split_plane = (split_plane + 1) % 3;
