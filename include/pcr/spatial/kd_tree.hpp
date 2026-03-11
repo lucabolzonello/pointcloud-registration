@@ -222,6 +222,18 @@ private:
   //  }
   //
   /**
+   * @brief Gets the current splitting dimension from the tree index of the given pivot point
+   *
+   * @param idx  Index of the pivot point to get the splitting dimension of
+   * @return uint8_t representing the current splitting dimension 0 = x, 1 = y, 2 = z
+   */
+  [[nodiscard]] static inline uint8_t get_split_dim_from_idx(const pcr::point_idx &idx) noexcept {
+    return pcr::log2(idx) + 1 % 3;
+  }
+
+
+
+  /**
    * @brief Gets the squared euclidean distance between two points
    *
    * @param p1 First point
@@ -240,6 +252,34 @@ private:
   }
 
   /**
+   * @brief Gets the squared euclidean distance between a point and an
+   * axis-aligned bounding box
+   *
+   * This should be the shortest distance from the point to intersection with
+   * bounding box
+   *
+   * @param query_point Query point
+   * @param bounding_box Bounding Box
+   * @return squared euclidean distance from the point to the
+   */
+  [[nodiscard]] static inline pcr::dist_t
+  get_dist_squared(const pcr::point_t &query_point,
+                   const core::BoundingBox<float> &bounding_box) {
+    // Compute by coordinate clamping
+    pcr::coord_t dx =
+        query_point.x - std::max(bounding_box.min_x,
+                                 std::min(query_point.x, bounding_box.max_x));
+    pcr::coord_t dy =
+        query_point.y - std::max(bounding_box.min_y,
+                                 std::min(query_point.y, bounding_box.max_y));
+    pcr::coord_t dz =
+        query_point.z - std::max(bounding_box.min_z,
+                                 std::min(query_point.z, bounding_box.max_z));
+
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  /**
    * @brief Check if point is within radius of query point
    *
    * Fast distance test using squared Euclidean distance.
@@ -255,6 +295,11 @@ private:
 
     return get_dist_squared(p1, p2) < radius_squared;
   }
+
+  template <typename HeapType>
+  void knn_search_rec(const pcr::point_t &query_point, pcr::point_idx curr_idx,
+                      pcr::point_idx k, core::BoundingBox<pcr::coord_t> bb,
+                      HeapType &result_max_heap) const;
 };
 
 } // namespace pcr::spatial
