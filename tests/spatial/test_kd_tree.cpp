@@ -28,6 +28,16 @@ pcr::core::PointCloud create_test_cloud() {
              static_cast<pcr::coord_t>(10.0)});
   cloud.add({static_cast<pcr::coord_t>(-10.0), static_cast<pcr::coord_t>(43.0),
              static_cast<pcr::coord_t>(10.0)});
+  cloud.add({static_cast<pcr::coord_t>(-90.2), static_cast<pcr::coord_t>(-20.0),
+             static_cast<pcr::coord_t>(-100.0)});
+  cloud.add({static_cast<pcr::coord_t>(-90.0), static_cast<pcr::coord_t>(-21.5),
+             static_cast<pcr::coord_t>(-100.8)});
+  cloud.add({static_cast<pcr::coord_t>(5.78), static_cast<pcr::coord_t>(56.2),
+             static_cast<pcr::coord_t>(20.0)});
+  cloud.add({static_cast<pcr::coord_t>(100.2),
+             static_cast<pcr::coord_t>(-100.0),
+             static_cast<pcr::coord_t>(25.0)});
+
   return cloud;
 }
 
@@ -143,6 +153,45 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     CHECK(k_nearest_distances[order[1]] ==
           Catch::Approx(static_cast<pcr::coord_t>(0.4225)));
   }
+
+  SECTION("K = 8 finds the 8 nearest neighbours") {
+    point_type query{static_cast<pcr::coord_t>(4.32),
+                     static_cast<pcr::coord_t>(28.950),
+                     static_cast<pcr::coord_t>(35.402)};
+
+    std::vector<pcr::point_idx> solution_indices = {2, 1, 0, 3, 11, 8, 7, 12};
+    std::vector<pcr::dist_t> solution_distances = {376.493, 396.099, 655.019, 931.590504, 981.916, 1047.73, 1065.17, 25929.278};
+
+    tree.knn_search(query, 8, k_nearest_indices, k_nearest_distances);
+
+    REQUIRE(k_nearest_indices.size() == 8);
+    REQUIRE(k_nearest_distances.size() == 8);
+
+    // Sort by distance from query point
+    std::vector<std::pair<pcr::dist_t, int>> sorted_pairs;
+    for (int i = 0; i < k_nearest_distances.size(); ++i) {
+      sorted_pairs.emplace_back(k_nearest_distances[i], k_nearest_indices[i]);
+    }
+    std::sort(sorted_pairs.begin(), sorted_pairs.end(),
+        [](const std::pair<pcr::dist_t, int>& a, const std::pair<pcr::dist_t, int>& b) {
+          return a.first < b.first;
+        });
+    for (int i = 0; i < sorted_pairs.size(); ++i) {
+      k_nearest_indices[i] = sorted_pairs[i].second;
+      k_nearest_distances[i] = sorted_pairs[i].first;
+    }
+
+    for (pcr::point_idx i = 0; i < k_nearest_distances.size(); ++i) {
+      // Check x,y,z values
+      CHECK(cloud[k_nearest_indices[i]].x ==  Catch::Approx(orig_cloud[solution_indices[i]].x));
+      CHECK(cloud[k_nearest_indices[i]].y ==  Catch::Approx(orig_cloud[solution_indices[i]].y));
+      CHECK(cloud[k_nearest_indices[i]].z ==  Catch::Approx(orig_cloud[solution_indices[i]].z));
+
+      // Check distance values
+      CHECK(k_nearest_distances[i] == Catch::Approx(solution_distances[i]));
+    }
+  }
+
 
   SECTION("Requesting K > total points returns all points available") {
     point_type query{static_cast<pcr::coord_t>(0.0),
