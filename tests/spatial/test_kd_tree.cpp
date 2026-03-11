@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <algorithm>
 #include <catch2/catch_all.hpp>
+#include <iostream>
 #include <vector>
 
 #include "pcr/core/point_cloud.hpp"
@@ -29,7 +30,6 @@ pcr::core::PointCloud create_test_cloud() {
              static_cast<pcr::coord_t>(10.0)});
   return cloud;
 }
-
 
 using point_type = pcr::point_t;
 
@@ -95,6 +95,22 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
 
   }
 
+  SECTION("K = 1 finds the nearest point") {
+    point_type query{static_cast<pcr::coord_t>(4.4),
+                  static_cast<pcr::coord_t>(29.1),
+                  static_cast<pcr::coord_t>(16.0)};
+    tree.knn_search(query, 1, k_nearest_indices, k_nearest_distances);
+
+    REQUIRE(k_nearest_indices.size() == 1);
+    REQUIRE(k_nearest_distances.size() == 1);
+
+    pcr::point_t near_point = orig_cloud[2];
+    CHECK((near_point.x == Catch::Approx(static_cast<pcr::coord_t>(4.5)) &&
+           near_point.y == Catch::Approx(static_cast<pcr::coord_t>(28.8)) &&
+           near_point.z == Catch::Approx(static_cast<pcr::coord_t>(16.0))));
+
+    CHECK(k_nearest_distances[0] ==
+          Catch::Approx(static_cast<pcr::coord_t>(0.1)));
   }
 
   SECTION("K=2 finds the 2 nearest neighbours") {
