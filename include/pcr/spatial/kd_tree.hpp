@@ -7,9 +7,11 @@
 #define KD_TREE_HPP
 
 #include <cstddef>
+#include <queue>
 #include <type_traits>
 #include <vector>
 
+#include "pcr/core/bounding_box.hpp"
 #include "pcr/core/point.hpp"
 #include "pcr/core/point_cloud.hpp"
 #include "pcr/prelude.hpp"
@@ -143,7 +145,6 @@ private:
    *
    * Recursively partitions points and constructs balanced tree.
    *
-   * @param cloud Reference to point cloud being indexed
    * @param left Index of leftmost element in current window
    * @param right Index one past rightmost element in current window
    * @param tree_idx Index in tree array where this node should be stored
@@ -295,6 +296,19 @@ private:
 
     return get_dist_squared(p1, p2) < radius_squared;
   }
+
+
+  /**
+   * @brief Recursive helper for knn_search
+   *
+   * @param query_point Point to search from
+   * @param curr_idx The current index of the tree that we are at
+   * @param k Number of nearest neighbors to find
+   * @param bb The current bounding box of the pivot point we are at
+   * @param[out] result_max_heap Priority queue that tracks the k-nearest-neighbours found so far.
+   *
+   * @post result_max_heap.size() == k
+   */
 
   template <typename HeapType>
   void knn_search_rec(const pcr::point_t &query_point, pcr::point_idx curr_idx,
