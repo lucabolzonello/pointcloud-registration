@@ -43,6 +43,96 @@ pcr::core::PointCloud create_test_cloud() {
 
 using point_type = pcr::point_t;
 
+// Brute force KNN search for verification
+void brute_force_knn(const pcr::core::PointCloud& cloud, const point_type& query,
+                     size_t k, std::vector<pcr::point_idx>& indices,
+                     std::vector<pcr::dist_t>& distances) {
+  indices.clear();
+  distances.clear();
+
+  std::vector<std::pair<pcr::dist_t, pcr::point_idx>> results;
+  for (size_t i = 0; i < cloud.size(); ++i) {
+    const auto& point = cloud[i];
+    pcr::dist_t dx = point.x - query.x;
+    pcr::dist_t dy = point.y - query.y;
+    pcr::dist_t dz = point.z - query.z;
+    pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
+    results.emplace_back(dist_sq, i);
+  }
+
+  std::sort(results.begin(), results.end());
+
+  size_t num_results = std::min(k, results.size());
+  for (size_t i = 0; i < num_results; ++i) {
+    distances.push_back(results[i].first);
+    indices.push_back(results[i].second);
+  }
+}
+
+// Brute force radius search for verification
+void brute_force_radius(const pcr::core::PointCloud& cloud, const point_type& query,
+                        pcr::dist_t radius, std::vector<pcr::point_idx>& indices,
+                        std::vector<pcr::dist_t>& distances) {
+  indices.clear();
+  distances.clear();
+
+  pcr::dist_t radius_sq = radius * radius;
+  for (size_t i = 0; i < cloud.size(); ++i) {
+    const auto& point = cloud[i];
+    pcr::dist_t dx = point.x - query.x;
+    pcr::dist_t dy = point.y - query.y;
+    pcr::dist_t dz = point.z - query.z;
+    pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
+
+    if (dist_sq <= radius_sq) {
+      distances.push_back(dist_sq);
+      indices.push_back(i);
+    }
+  }
+}
+
+// Compare two search results (sorts and checks if they match)
+bool compare_results(const pcr::core::PointCloud& cloud,
+                    std::vector<pcr::point_idx> indices1,
+                    std::vector<pcr::dist_t> distances1,
+                    std::vector<pcr::point_idx> indices2,
+                    std::vector<pcr::dist_t> distances2,
+                    pcr::dist_t tolerance = 1e-6) {
+  if (indices1.size() != indices2.size() || distances1.size() != distances2.size()) {
+    return false;
+  }
+
+  // Create pairs and sort both
+  std::vector<std::pair<pcr::dist_t, pcr::point_idx>> pairs1, pairs2;
+  for (size_t i = 0; i < indices1.size(); ++i) {
+    pairs1.emplace_back(distances1[i], indices1[i]);
+    pairs2.emplace_back(distances2[i], indices2[i]);
+  }
+
+  std::sort(pairs1.begin(), pairs1.end());
+  std::sort(pairs2.begin(), pairs2.end());
+
+  // Compare sorted results
+  for (size_t i = 0; i < pairs1.size(); ++i) {
+    // Compare distances
+    if (std::abs(pairs1[i].first - pairs2[i].first) > tolerance) {
+      printf("Different distances");
+      return false;
+    }
+
+    // Compare points by x, y, z values
+    const auto& pt1 = cloud[pairs1[i].second];
+    const auto& pt2 = cloud[pairs2[i].second];
+    if (std::abs(pt1.x - pt2.x) > tolerance ||
+        std::abs(pt1.y - pt2.y) > tolerance ||
+        std::abs(pt1.z - pt2.z) > tolerance) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
 
   SECTION("Default constructor functions") {
@@ -80,7 +170,6 @@ TEST_CASE("KdTree: Empty Cloud Behavior", "[spatial]") {
 TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
   pcr::spatial::KdTree tree;
   auto cloud = create_test_cloud();
-  auto orig_cloud = cloud; // Copy for the convenience of testing
   tree.build_index(&cloud);
 
   std::vector<pcr::point_idx> k_nearest_indices;
@@ -90,68 +179,45 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     point_type query{static_cast<pcr::coord_t>(36.2),
                      static_cast<pcr::coord_t>(669.0),
                      static_cast<pcr::coord_t>(21.0)};
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_knn(cloud, query, 1, brute_indices, brute_distances);
+
     tree.knn_search(query, 1, k_nearest_indices, k_nearest_distances);
 
-    REQUIRE(k_nearest_indices.size() == 1);
-    REQUIRE(k_nearest_distances.size() == 1);
-
-    pcr::point_t near_point = orig_cloud[4];
-    CHECK((near_point.x == Catch::Approx(static_cast<pcr::coord_t>(36.2)) &&
-           near_point.y == Catch::Approx(static_cast<pcr::coord_t>(669.0)) &&
-           near_point.z == Catch::Approx(static_cast<pcr::coord_t>(21.0))));
-
-    CHECK(k_nearest_distances[0] ==
-          Catch::Approx(static_cast<pcr::coord_t>(0.0)));
-
+    CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
+                         brute_indices, brute_distances));
   }
 
   SECTION("K = 1 finds the nearest point") {
     point_type query{static_cast<pcr::coord_t>(4.4),
                   static_cast<pcr::coord_t>(29.1),
                   static_cast<pcr::coord_t>(16.0)};
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_knn(cloud, query, 1, brute_indices, brute_distances);
+
     tree.knn_search(query, 1, k_nearest_indices, k_nearest_distances);
 
-    REQUIRE(k_nearest_indices.size() == 1);
-    REQUIRE(k_nearest_distances.size() == 1);
-
-    pcr::point_t near_point = orig_cloud[2];
-    CHECK((near_point.x == Catch::Approx(static_cast<pcr::coord_t>(4.5)) &&
-           near_point.y == Catch::Approx(static_cast<pcr::coord_t>(28.8)) &&
-           near_point.z == Catch::Approx(static_cast<pcr::coord_t>(16.0))));
-
-    CHECK(k_nearest_distances[0] ==
-          Catch::Approx(static_cast<pcr::coord_t>(0.1)));
+    CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
+                         brute_indices, brute_distances));
   }
 
   SECTION("K=2 finds the 2 nearest neighbours") {
     point_type query{static_cast<pcr::coord_t>(4.3),
                      static_cast<pcr::coord_t>(28.95),
                      static_cast<pcr::coord_t>(15.4)};
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_knn(cloud, query, 2, brute_indices, brute_distances);
+
     tree.knn_search(query, 2, k_nearest_indices, k_nearest_distances);
 
-    REQUIRE(k_nearest_indices.size() == 2);
-    REQUIRE(k_nearest_distances.size() == 2);
-
-    std::vector<int> order{k_nearest_distances[0] <= k_nearest_distances[1] ? 0
-                                                                               : 1,
-                              k_nearest_distances[0] <= k_nearest_distances[1] ? 1
-                                                                               : 0};
-
-    pcr::point_t first_point = orig_cloud[1];
-    pcr::point_t second_point = orig_cloud[2];
-
-    CHECK(first_point.x == Catch::Approx(static_cast<pcr::coord_t>(4.4)));
-    CHECK(first_point.y == Catch::Approx(static_cast<pcr::coord_t>(29.0)));
-    CHECK(first_point.z == Catch::Approx(static_cast<pcr::coord_t>(15.5)));
-
-    CHECK(second_point.x == Catch::Approx(static_cast<pcr::coord_t>(4.5)));
-    CHECK(second_point.y == Catch::Approx(static_cast<pcr::coord_t>(28.8)));
-    CHECK(second_point.z == Catch::Approx(static_cast<pcr::coord_t>(16.0)));
-
-    CHECK(k_nearest_distances[order[0]] ==
-          Catch::Approx(static_cast<pcr::coord_t>(0.0225)));
-    CHECK(k_nearest_distances[order[1]] ==
-          Catch::Approx(static_cast<pcr::coord_t>(0.4225)));
+    CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
+                         brute_indices, brute_distances));
   }
 
   SECTION("K = 8 finds the 8 nearest neighbours") {
@@ -159,37 +225,14 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
                      static_cast<pcr::coord_t>(28.950),
                      static_cast<pcr::coord_t>(35.402)};
 
-    std::vector<pcr::point_idx> solution_indices = {2, 1, 0, 3, 11, 8, 7, 12};
-    std::vector<pcr::dist_t> solution_distances = {376.493, 396.099, 655.019, 931.590504, 981.916, 1047.73, 1065.17, 25929.278};
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_knn(cloud, query, 8, brute_indices, brute_distances);
 
     tree.knn_search(query, 8, k_nearest_indices, k_nearest_distances);
 
-    REQUIRE(k_nearest_indices.size() == 8);
-    REQUIRE(k_nearest_distances.size() == 8);
-
-    // Sort by distance from query point
-    std::vector<std::pair<pcr::dist_t, int>> sorted_pairs;
-    for (int i = 0; i < k_nearest_distances.size(); ++i) {
-      sorted_pairs.emplace_back(k_nearest_distances[i], k_nearest_indices[i]);
-    }
-    std::sort(sorted_pairs.begin(), sorted_pairs.end(),
-        [](const std::pair<pcr::dist_t, int>& a, const std::pair<pcr::dist_t, int>& b) {
-          return a.first < b.first;
-        });
-    for (int i = 0; i < sorted_pairs.size(); ++i) {
-      k_nearest_indices[i] = sorted_pairs[i].second;
-      k_nearest_distances[i] = sorted_pairs[i].first;
-    }
-
-    for (pcr::point_idx i = 0; i < k_nearest_distances.size(); ++i) {
-      // Check x,y,z values
-      CHECK(cloud[k_nearest_indices[i]].x ==  Catch::Approx(orig_cloud[solution_indices[i]].x));
-      CHECK(cloud[k_nearest_indices[i]].y ==  Catch::Approx(orig_cloud[solution_indices[i]].y));
-      CHECK(cloud[k_nearest_indices[i]].z ==  Catch::Approx(orig_cloud[solution_indices[i]].z));
-
-      // Check distance values
-      CHECK(k_nearest_distances[i] == Catch::Approx(solution_distances[i]));
-    }
+    CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
+                         brute_indices, brute_distances));
   }
 
 
@@ -197,9 +240,15 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     point_type query{static_cast<pcr::coord_t>(0.0),
                      static_cast<pcr::coord_t>(0.0),
                      static_cast<pcr::coord_t>(0.0)};
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_knn(cloud, query, 100, brute_indices, brute_distances);
+
     tree.knn_search(query, 100, k_nearest_indices, k_nearest_distances);
-    CHECK(k_nearest_indices.size() == cloud.size());
-    CHECK(k_nearest_distances.size() == cloud.size());
+
+    CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
+                         brute_indices, brute_distances));
   }
 }
 
@@ -216,13 +265,15 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
                      static_cast<pcr::coord_t>(669.0),
                      static_cast<pcr::coord_t>(21.0)};
     pcr::dist_t radius = 0.5;
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_radius(cloud, query, radius, brute_indices, brute_distances);
+
     tree.radius_search(query, radius, indices, distances_squared);
 
-    REQUIRE(indices.size() == 1);
-    REQUIRE(distances_squared.size() == 1);
-    CHECK(cloud[indices[0]].x == Catch::Approx(static_cast<pcr::coord_t>(36.2)));
-    CHECK(cloud[indices[0]].y == Catch::Approx(static_cast<pcr::coord_t>(669.0)));
-    CHECK(cloud[indices[0]].z == Catch::Approx(static_cast<pcr::coord_t>(21.0)));
+    CHECK(compare_results(cloud, indices, distances_squared,
+                         brute_indices, brute_distances));
   }
 
   SECTION("Large radius finds all points") {
@@ -230,29 +281,30 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
                      static_cast<pcr::coord_t>(0.0),
                      static_cast<pcr::coord_t>(0.0)};
     pcr::dist_t radius = 10000.0;
+
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_radius(cloud, query, radius, brute_indices, brute_distances);
+
     tree.radius_search(query, radius, indices, distances_squared);
 
-    CHECK(indices.size() == cloud.size());
-    CHECK(distances_squared.size() == cloud.size());
+    CHECK(compare_results(cloud, indices, distances_squared,
+                         brute_indices, brute_distances));
   }
 
   SECTION("Distances returned are squared") {
     point_type query{static_cast<pcr::coord_t>(36.3),
                      static_cast<pcr::coord_t>(669.0),
                      static_cast<pcr::coord_t>(21.0)};
-    tree.radius_search(query, static_cast<pcr::dist_t>(1.0), indices,
-                       distances_squared);
+    pcr::dist_t radius = 1.0;
 
-    auto it = std::find_if(indices.begin(), indices.end(), [&](pcr::point_idx idx) {
-      const pcr::point_t point = cloud[idx];
-      return point.x == Catch::Approx(static_cast<pcr::coord_t>(36.2)) &&
-             point.y == Catch::Approx(static_cast<pcr::coord_t>(669.0)) &&
-             point.z == Catch::Approx(static_cast<pcr::coord_t>(21.0));
-    });
+    std::vector<pcr::point_idx> brute_indices;
+    std::vector<pcr::dist_t> brute_distances;
+    brute_force_radius(cloud, query, radius, brute_indices, brute_distances);
 
-    REQUIRE(it != indices.end());
-    auto found_idx = static_cast<size_t>(std::distance(indices.begin(), it));
-    CHECK(distances_squared[found_idx] ==
-          Catch::Approx(static_cast<pcr::dist_t>(0.01)));
+    tree.radius_search(query, radius, indices, distances_squared);
+
+    CHECK(compare_results(cloud, indices, distances_squared,
+                         brute_indices, brute_distances));
   }
 }
