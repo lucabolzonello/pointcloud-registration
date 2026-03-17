@@ -153,9 +153,11 @@ void KdTree::knn_search_rec(const pcr::point_t &query_point, pcr::point_idx k,
   // Recurse near-side
   knn_search_rec(query_point, k, nearer_idx, nearer_bb, result_max_heap);
 
-  // Recurse far side
-  knn_search_rec(query_point, k, farther_idx, farther_bb, result_max_heap);
-}
+  // Prune farther_bb path if the bounding box's distance is further than max dist
+ if (get_dist_squared(query_point, farther_bb, split_dim) < result_max_heap.top().m_dist_squared) {
+    // Recurse far side
+    knn_search_rec(query_point, k, farther_idx, farther_bb, result_max_heap);
+ }
 
 void KdTree::radius_search(
     const pcr::point_t &query_point, pcr::dist_t radius,
