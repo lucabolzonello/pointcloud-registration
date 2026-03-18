@@ -53,22 +53,14 @@ void KdTree::knn_search(const pcr::point_t &query_point, pcr::point_idx k,
                         std::vector<pcr::point_idx> &out_indices,
                         std::vector<pcr::dist_t> &out_distances_squared) const {
 
-  // if m_point_cloud is empty then return empty
-  if (m_point_cloud->is_empty()) {
-    // if empty then return 2 empty lists
-    out_indices.resize(0);
-    out_distances_squared.resize(0);
-    return;
-  }
-
   // if k > m_point_cloud.size(), return all points
   if (m_point_cloud->size() <= k) {
-    out_indices.resize(m_point_cloud->size());
-    out_distances_squared.resize(m_point_cloud->size());
+    out_indices.reserve(m_point_cloud->size());
+    out_distances_squared.reserve(m_point_cloud->size());
 
     for (size_t i = 0; i < m_point_cloud->size(); ++i) {
-      out_indices[i] = i;
-      out_distances_squared[i] = get_dist_squared(query_point, (*m_point_cloud)[i]);
+      out_indices.push_back(i);
+      out_distances_squared.push_back(get_dist_squared(query_point, (*m_point_cloud)[i]));
     }
     return;
   }
@@ -82,10 +74,10 @@ void KdTree::knn_search(const pcr::point_t &query_point, pcr::point_idx k,
   // using the priority queue
   std::vector<PriorityQueueItem> priority_queue_vector;
   priority_queue_vector.reserve(k);
-
   std::priority_queue<PriorityQueueItem, std::vector<PriorityQueueItem>,
                       decltype(cmp)>
       result_heap(cmp, std::move(priority_queue_vector));
+
   // perform recursive search
   knn_search_rec(query_point, k, 0, m_point_cloud->get_bounding_box(),
                  result_heap);
