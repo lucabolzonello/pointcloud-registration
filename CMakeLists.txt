@@ -21,6 +21,18 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
 endif ()
 
+if (CMAKE_BUILD_TYPE STREQUAL "debug")
+    message("Configuring debug build")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif ()
+if (CMAKE_BUILD_TYPE STREQUAL "relwithdebinfo")
+    message("configuring release with debug info build")
+    set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -g")
+endif ()
+# include source path
+add_compile_definitions("DATASETS_PATH=${CMAKE_SOURCE_DIR}/datasets")
+
+
 # =========================
 # Options
 # =========================
