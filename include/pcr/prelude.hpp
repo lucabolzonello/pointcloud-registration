@@ -15,7 +15,7 @@
  */
 namespace pcr {
 
-using coord_t = float;  ///< Data type for all coordinates
+using coord_t = float; ///< Data type for all coordinates
 using dist_t = coord_t; /// < Data type for distances
 
 // CAUTION: If you change point_idx, you must also change log2 bit width
@@ -33,7 +33,8 @@ using point_idx = uint32_t; ///< Data type for indexing into PointCloud
   _BitScanReverse(&index, n);
   return static_cast<uint8_t>(index);
 #elif defined(__GNUC__) || defined(__clang__)
-  return static_cast<uint8_t>(31 - __builtin_clz(n)); // update to match bit width
+  return static_cast<uint8_t>(31 - __builtin_clz(n));
+  // update to match bit width
 #else
   int result = 0;
   while (n >>= 1) {

@@ -36,11 +36,13 @@ struct PriorityQueueItem {
    * @param dist_squared squared distance between point and query point
    */
   PriorityQueueItem(pcr::point_idx point_cloud_idx, pcr::dist_t dist_squared)
-      : m_point_cloud_idx(point_cloud_idx), m_dist_squared(dist_squared) {}
+    : m_point_cloud_idx(point_cloud_idx), m_dist_squared(dist_squared) {
+  }
 
   pcr::point_idx m_point_cloud_idx; ///< Point cloud index of point (4 bytes)
-  pcr::dist_t m_dist_squared; ///<  Squared distance between point and query
-                              ///<  point (4 bytes)
+  pcr::dist_t m_dist_squared;
+  ///<  Squared distance between point and query
+                               ///<  point (4 bytes)
 };
 
 /**
@@ -228,10 +230,10 @@ private:
    * @param idx  Index of the pivot point to get the splitting dimension of
    * @return uint8_t representing the current splitting dimension 0 = x, 1 = y, 2 = z
    */
-  [[nodiscard]] static inline uint8_t get_split_dim_from_idx(const pcr::point_idx &idx) noexcept {
+  [[nodiscard]] static inline uint8_t get_split_dim_from_idx(
+      const pcr::point_idx &idx) noexcept {
     return pcr::log2(idx) + 1 % 3;
   }
-
 
 
   /**

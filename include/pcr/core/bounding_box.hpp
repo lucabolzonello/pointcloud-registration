@@ -30,12 +30,13 @@ template <typename T> struct BoundingBox {
    * initialized.
    */
   BoundingBox()
-      : min_x(std::numeric_limits<T>::max()),
-        min_y(std::numeric_limits<T>::max()),
-        min_z(std::numeric_limits<T>::max()),
-        max_x(std::numeric_limits<T>::lowest()),
-        max_y(std::numeric_limits<T>::lowest()),
-        max_z(std::numeric_limits<T>::lowest()) {}
+    : min_x(std::numeric_limits<T>::max()),
+      min_y(std::numeric_limits<T>::max()),
+      min_z(std::numeric_limits<T>::max()),
+      max_x(std::numeric_limits<T>::lowest()),
+      max_y(std::numeric_limits<T>::lowest()),
+      max_z(std::numeric_limits<T>::lowest()) {
+  }
 
   /**
    * @brief Copy Constructor

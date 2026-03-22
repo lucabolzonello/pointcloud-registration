@@ -187,13 +187,13 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     tree.knn_search(query, 1, k_nearest_indices, k_nearest_distances);
 
     CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 
   SECTION("K = 1 finds the nearest point") {
     point_type query{static_cast<pcr::coord_t>(4.4),
-                  static_cast<pcr::coord_t>(29.1),
-                  static_cast<pcr::coord_t>(16.0)};
+                     static_cast<pcr::coord_t>(29.1),
+                     static_cast<pcr::coord_t>(16.0)};
 
     std::vector<pcr::point_idx> brute_indices;
     std::vector<pcr::dist_t> brute_distances;
@@ -202,7 +202,7 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     tree.knn_search(query, 1, k_nearest_indices, k_nearest_distances);
 
     CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 
   SECTION("K=2 finds the 2 nearest neighbours") {
@@ -217,7 +217,7 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     tree.knn_search(query, 2, k_nearest_indices, k_nearest_distances);
 
     CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 
   SECTION("K = 8 finds the 8 nearest neighbours") {
@@ -232,9 +232,8 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     tree.knn_search(query, 8, k_nearest_indices, k_nearest_distances);
 
     CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
-
 
   SECTION("Requesting K > total points returns all points available") {
     point_type query{static_cast<pcr::coord_t>(0.0),
@@ -248,7 +247,7 @@ TEST_CASE("KdTree: KNN Search Logic", "[spatial]") {
     tree.knn_search(query, 100, k_nearest_indices, k_nearest_distances);
 
     CHECK(compare_results(cloud, k_nearest_indices, k_nearest_distances,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 }
 
@@ -273,7 +272,7 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
     tree.radius_search(query, radius, indices, distances_squared);
 
     CHECK(compare_results(cloud, indices, distances_squared,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 
   SECTION("Large radius finds all points") {
@@ -289,7 +288,7 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
     tree.radius_search(query, radius, indices, distances_squared);
 
     CHECK(compare_results(cloud, indices, distances_squared,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 
   SECTION("Distances returned are squared") {
@@ -305,6 +304,6 @@ TEST_CASE("KdTree: Radius Search Logic", "[spatial]") {
     tree.radius_search(query, radius, indices, distances_squared);
 
     CHECK(compare_results(cloud, indices, distances_squared,
-                         brute_indices, brute_distances));
+      brute_indices, brute_distances));
   }
 }
