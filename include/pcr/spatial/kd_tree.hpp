@@ -139,6 +139,7 @@ private:
    * @brief Raw pointer to the input point cloud
    */
   pcr::core::PointCloud *m_point_cloud;
+  pcr::point_idx m_point_cloud_size;
 
   /**
    * @brief Recursive helper for building tree
@@ -147,11 +148,10 @@ private:
    *
    * @param left Index of leftmost element in current window
    * @param right Index one past rightmost element in current window
-   * @param tree_idx Index in tree array where this node should be stored
    * @param split_plane Current dimension to split along
    */
   void build_index_rec(pcr::point_idx left, pcr::point_idx right,
-                       pcr::point_idx tree_idx, uint8_t split_plane);
+                       uint8_t split_plane);
 
   /**
    * @brief Helper for getting the points coordinate value along the split
@@ -302,17 +302,20 @@ private:
    * @brief Recursive helper for knn_search
    *
    * @param query_point Point to search from
-   * @param curr_idx The current index of the tree that we are at
    * @param k Number of nearest neighbors to find
+   * @param left The index of the leftmost node in the current subarray
+   * @param right The index one-past the rightmost node in the current subarray
+   * @param split_dim The dimension to split on
    * @param bb The current bounding box of the pivot point we are at
    * @param[out] result_max_heap Priority queue that tracks the k-nearest-neighbours found so far.
    *
    * @post result_max_heap.size() == k
    */
-
   template <typename HeapType>
-  void knn_search_rec(const pcr::point_t &query_point, pcr::point_idx curr_idx,
-                      pcr::point_idx k, core::BoundingBox<pcr::coord_t> bb,
+  void knn_search_rec(const pcr::point_t &query_point, pcr::point_idx k,
+                      pcr::point_idx left, pcr::point_idx right,
+                      uint8_t split_dim,
+                      const core::BoundingBox<pcr::coord_t> &bb,
                       HeapType &result_max_heap) const;
 };
 
