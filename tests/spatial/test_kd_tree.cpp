@@ -6,6 +6,8 @@
 
 #include "pcr/core/point_cloud.hpp"
 #include "pcr/spatial/kd_tree.hpp"
+#include "../tests/spatial/kd_tree_helpers.hpp"
+
 
 // Helper to create a simple test cloud
 pcr::core::PointCloud create_test_cloud() {
@@ -42,96 +44,6 @@ pcr::core::PointCloud create_test_cloud() {
 }
 
 using point_type = pcr::point_t;
-
-// Brute force KNN search for verification
-void brute_force_knn(const pcr::core::PointCloud& cloud, const point_type& query,
-                     size_t k, std::vector<pcr::point_idx>& indices,
-                     std::vector<pcr::dist_t>& distances) {
-  indices.clear();
-  distances.clear();
-
-  std::vector<std::pair<pcr::dist_t, pcr::point_idx>> results;
-  for (size_t i = 0; i < cloud.size(); ++i) {
-    const auto& point = cloud[i];
-    pcr::dist_t dx = point.x - query.x;
-    pcr::dist_t dy = point.y - query.y;
-    pcr::dist_t dz = point.z - query.z;
-    pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
-    results.emplace_back(dist_sq, i);
-  }
-
-  std::sort(results.begin(), results.end());
-
-  size_t num_results = std::min(k, results.size());
-  for (size_t i = 0; i < num_results; ++i) {
-    distances.push_back(results[i].first);
-    indices.push_back(results[i].second);
-  }
-}
-
-// Brute force radius search for verification
-void brute_force_radius(const pcr::core::PointCloud& cloud, const point_type& query,
-                        pcr::dist_t radius, std::vector<pcr::point_idx>& indices,
-                        std::vector<pcr::dist_t>& distances) {
-  indices.clear();
-  distances.clear();
-
-  pcr::dist_t radius_sq = radius * radius;
-  for (size_t i = 0; i < cloud.size(); ++i) {
-    const auto& point = cloud[i];
-    pcr::dist_t dx = point.x - query.x;
-    pcr::dist_t dy = point.y - query.y;
-    pcr::dist_t dz = point.z - query.z;
-    pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
-
-    if (dist_sq <= radius_sq) {
-      distances.push_back(dist_sq);
-      indices.push_back(i);
-    }
-  }
-}
-
-// Compare two search results (sorts and checks if they match)
-bool compare_results(const pcr::core::PointCloud& cloud,
-                    std::vector<pcr::point_idx> indices1,
-                    std::vector<pcr::dist_t> distances1,
-                    std::vector<pcr::point_idx> indices2,
-                    std::vector<pcr::dist_t> distances2,
-                    pcr::dist_t tolerance = 1e-6) {
-  if (indices1.size() != indices2.size() || distances1.size() != distances2.size()) {
-    return false;
-  }
-
-  // Create pairs and sort both
-  std::vector<std::pair<pcr::dist_t, pcr::point_idx>> pairs1, pairs2;
-  for (size_t i = 0; i < indices1.size(); ++i) {
-    pairs1.emplace_back(distances1[i], indices1[i]);
-    pairs2.emplace_back(distances2[i], indices2[i]);
-  }
-
-  std::sort(pairs1.begin(), pairs1.end());
-  std::sort(pairs2.begin(), pairs2.end());
-
-  // Compare sorted results
-  for (size_t i = 0; i < pairs1.size(); ++i) {
-    // Compare distances
-    if (std::abs(pairs1[i].first - pairs2[i].first) > tolerance) {
-      printf("Different distances");
-      return false;
-    }
-
-    // Compare points by x, y, z values
-    const auto& pt1 = cloud[pairs1[i].second];
-    const auto& pt2 = cloud[pairs2[i].second];
-    if (std::abs(pt1.x - pt2.x) > tolerance ||
-        std::abs(pt1.y - pt2.y) > tolerance ||
-        std::abs(pt1.z - pt2.z) > tolerance) {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 TEST_CASE("KdTree: Construction and Custom Dimensions", "[spatial]") {
 
