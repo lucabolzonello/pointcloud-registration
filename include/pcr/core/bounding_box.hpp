@@ -60,24 +60,24 @@ template <typename T> struct BoundingBox {
    * @param split_dimension The dimension to split along (0 for x, 1 for y, 2
    * for z)
    */
-  void split(bool left_side, uint8_t split_dimension) {
+  void split(bool left_side, uint8_t split_dimension, T split_val) {
     if (split_dimension == 0) {
       if (left_side) {
-        max_x = (min_x + max_x) / 2;
+        max_x = split_val;
       } else {
-        min_x = (min_x + max_x) / 2;
+        min_x = split_val;
       }
     } else if (split_dimension == 1) {
       if (left_side) {
-        max_y = (min_y + max_y) / 2;
+        max_y = split_val;
       } else {
-        min_y = (min_y + max_y) / 2;
+        min_y = split_val;
       }
     } else if (split_dimension == 2) {
       if (left_side) {
-        max_z = (min_z + max_z) / 2;
+        max_z = split_val;
       } else {
-        min_z = (min_z + max_z) / 2;
+        min_z = split_val;
       }
     }
   }
