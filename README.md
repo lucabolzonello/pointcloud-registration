@@ -36,6 +36,21 @@ cmake ..
 make
 ```
 
+It is important to download the sample datasets for the project, currently this consists of the Stanford Bunny dataset.
+To load automatically load this data in the right format, run the following from the root directory.
+
+If on a Mac/Linux based system:
+
+```
+./download_datasets.sh
+```
+
+If on a Windows system:
+
+```
+.\download_datasets.ps1
+```
+
 Then to run the test suite, you can run the following (ctest_kd_tree fails at the moment because I haven't finished
 implementing the KD-tree yet) :
 
