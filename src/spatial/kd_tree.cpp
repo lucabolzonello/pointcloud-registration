@@ -171,7 +171,7 @@ void KdTree::radius_search(
     std::vector<pcr::point_idx> &out_indices,
     std::vector<pcr::dist_t> &out_distances_squared) const {
   // perform recursive search
-  radius_search_rec(query_point, radius * radius, 0,
+  radius_search_rec(query_point, radius * radius, 0, m_point_cloud_size, 0,
                     m_point_cloud->get_bounding_box(),
                     out_indices, out_distances_squared);
 
@@ -179,68 +179,70 @@ void KdTree::radius_search(
 
 void KdTree::radius_search_rec(const pcr::point_t &query_point,
                                pcr::dist_t radius_squared,
-                               pcr::point_idx curr_idx,
+                               pcr::point_idx left, pcr::point_idx right,
+                               uint8_t split_dim,
                                const pcr::core::BoundingBox<pcr::coord_t> &bb,
                                std::vector<pcr::point_idx> &out_indices,
                                std::vector<pcr::dist_t> &
                                out_distances_squared)
 const {
 
-  // If node is out of bounds return
-  //if (curr_idx >= m_point_cloud->size()) return;
-  if (curr_idx >= m_point_cloud_size)
+  // If past leaf node then return
+  if (left == right)
     return;
+
+  pcr::point_idx curr_idx = left + (right - left) / 2;
 
   // Check current node, add to heap if it one of the K-nearest-neighbours
   // found so far
   pcr::dist_t dist_to_point =
       get_dist_squared((*m_point_cloud)[curr_idx], query_point);
 
-  if (dist_to_point <= radius_squared) {
-    // pop current max_element and push onto heap
+  if (dist_to_point < radius_squared) {
     out_indices.push_back(curr_idx);
     out_distances_squared.push_back(dist_to_point);
   }
-
-  uint8_t split_dim = get_split_dim_from_idx(curr_idx);
 
   // Determine which side of the split plane the query point is on
   coord_t split_value =
       split_val((*m_point_cloud)[curr_idx], split_dim);
 
-  pcr::point_idx nearer_idx, farther_idx;
+  pcr::point_idx near_left, near_right;
+  pcr::point_idx far_left, far_right;
   pcr::core::BoundingBox<pcr::coord_t> nearer_bb = bb;
   pcr::core::BoundingBox<pcr::coord_t> farther_bb = bb;
 
   if (split_val(query_point, split_dim) < split_value) {
-    nearer_idx = left_node(curr_idx);
-    farther_idx = right_node(curr_idx);
+    near_left = left;
+    near_right = curr_idx;
+    far_left = curr_idx + 1;
+    far_right = right;
     nearer_bb.split(true, split_dim, split_value);
     farther_bb.split(false, split_dim, split_value);
 
   } else {
-    nearer_idx = right_node(curr_idx);
-    farther_idx = left_node(curr_idx);
+    near_left = curr_idx + 1;
+    near_right = right;
+    far_left = left;
+    far_right = curr_idx;
     nearer_bb.split(false, split_dim, split_value);
     farther_bb.split(true, split_dim, split_value);
   }
 
+  split_dim = (split_dim + 1) % 3;
+
   // Recurse near-side
-  radius_search_rec(query_point, radius_squared, nearer_idx, nearer_bb,
-                    out_indices,
-                    out_distances_squared);
+  radius_search_rec(query_point, radius_squared, near_left, near_right,
+                    split_dim,
+                    nearer_bb, out_indices, out_distances_squared);
 
-  // Prune farther_bb path if the bounding box's distance is further than radius
-  pcr::dist_t dist_to_bb = get_dist_squared_original(query_point, farther_bb,
-    split_dim);
-  if (dist_to_bb <=
-      radius_squared) {
+  // Prune farther_bb path if the bounding box's distance is further than max dist
+  if (get_dist_squared(query_point, farther_bb, split_dim) < radius_squared) {
     // Recurse far side
-    radius_search_rec(query_point, radius_squared, farther_idx, farther_bb,
-                      out_indices,
-                      out_distances_squared);
-
-    printf("Here\n");
+    radius_search_rec(query_point, radius_squared, far_left, far_right,
+                      split_dim,
+                      farther_bb,
+                      out_indices, out_distances_squared);
   }
 }
 

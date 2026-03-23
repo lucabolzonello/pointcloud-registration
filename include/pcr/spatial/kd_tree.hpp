@@ -319,6 +319,27 @@ private:
                       uint8_t split_dim,
                       const core::BoundingBox<pcr::coord_t> &bb,
                       HeapType &result_max_heap) const;
+
+
+  /**
+  * @brief Recursive helper for radius_search
+  *
+  * @param query_point Point to search from
+  * @param radius_squared Max squared radius distance to search for neighbour points
+  * @param bb The current bounding box of the pivot point we are at
+  * @param[out] out_indices Vector to receive indices of points within radius
+  * @param[out] out_distances_squared Vector to receive squared distances
+  *
+  * @post result_max_heap.size() == k
+  */
+  void radius_search_rec(const pcr::point_t &query_point,
+                         pcr::dist_t radius_squared,
+                         pcr::point_idx left, pcr::point_idx right,
+                         uint8_t split_dim,
+                         const pcr::core::BoundingBox<pcr::coord_t> &bb,
+                         std::vector<pcr::point_idx> &out_indices,
+                         std::vector<pcr::dist_t> &out_distances_squared) const;
+
 };
 
 } // namespace pcr::spatial
