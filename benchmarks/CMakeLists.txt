@@ -8,22 +8,18 @@ function(pcr_add_benchmark TARGET_NAME)
     # Add pcr library
     target_link_libraries(${TARGET_NAME} PRIVATE pcr benchmark::benchmark)
 
-    # Force release-level optimizations
-    if (MSVC)
-        target_compile_options(${TARGET_NAME} PRIVATE /O2)
-    else ()
-        target_compile_options(${TARGET_NAME} PRIVATE -O3)
-    endif ()
-
 
     # Set project warnings
     if (COMMAND set_project_warnings)
         set_project_warnings(${TARGET_NAME})
     endif ()
 
-    set_target_properties(${TARGET_NAME} PROPERTIES
-            CODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS "YES"
-    )
+    if (APPLE)
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND codesign --force --entitlements ${CMAKE_SOURCE_DIR}/entitlements.plist -s - $<TARGET_FILE:${TARGET_NAME}>
+                COMMENT "Signing with get-task-allow for Processor Trace"
+        )
+    endif ()
 
     message(STATUS "Configured benchmark ${TARGET_NAME} with forced optimization.")
 endfunction()
