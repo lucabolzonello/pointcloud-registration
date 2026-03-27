@@ -21,6 +21,17 @@ find interesting, but I do try to keep it fairly well documented.
 - Implement ICP algorithm (Will start with a simple point-to-point approach)
 - Begin making some examples with cool visualizations.
 - Tons of benchmarking and optimization improvements to be made!
+## Performance
+
+The following table shows the performance of the KD-Tree and Brute Force implementations for the KNN and Radius Search
+queries. The exact numbers are to be taken with a grain of salt, as the value of testing against arbitrarily chosen
+brute force implementations is not incredibly meaningful. However, I believe it still does enough to confirm that
+the Kd-Tree implementations are a much better approach than naive methods.
+
+| Query Type              | Brute Force | KD-Tree | Speedup |
+|-------------------------|-------------|---------|---------|
+| KNN (k=10, 40k pts)     | 6,500 ms    | 300 ms  | 21.7x   |
+| Radius Search (40k pts) | 1500 ms     | 800 ms  | 1.8x    |
 
 ## Building the Project
 
