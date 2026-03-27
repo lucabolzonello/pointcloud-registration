@@ -71,12 +71,8 @@ cd tests
 ctest
 ```
 
-## Generating Doxygen Documentation
+## Viewing Documentation
 
-For this project I have chosen to use Doxygen to allow for automated documentation creation.
-
-To generate the docs do the following:
-
-1. [Download Doxygen](https://www.doxygen.nl/download.html)
-2. Navigate to root directory and run ```doxygen Doxyfile```
-3. Documentation will be generated under the "docs/doxygen" directory
+The documentation for this project can be
+found [here](https://lucabolzonello.github.io/pointcloud-registration/).
+The documentation is automatically generated using Doxygen.
