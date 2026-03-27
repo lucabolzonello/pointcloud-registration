@@ -22,14 +22,16 @@ void brute_force_knn(const pcr::core::PointCloud &cloud,
     results.emplace_back(dist_sq, i);
   }
 
-  std::sort(results.begin(), results.end());
+  const size_t num_results = std::min(k, results.size());
+  std::nth_element(results.begin(), results.begin() + num_results,
+                   results.end());
 
-  size_t num_results = std::min(k, results.size());
   for (size_t i = 0; i < num_results; ++i) {
     distances.push_back(results[i].first);
     indices.push_back(results[i].second);
   }
 }
+
 
 // Brute force radius search for verification
 void brute_force_radius(const pcr::core::PointCloud &cloud,
