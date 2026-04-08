@@ -1,14 +1,14 @@
 # Point Cloud Registration Project
 
 A point cloud processing pipeline written in modern C++ with the end goal to create a Point Cloud Registration Pipeline
-implementing iterative closest point (ICP). It is mostly just for fun and for me to be able to explore a topic that I
-find interesting, but I do try to keep it fairly well documented.
+implementing the iterative closest point (ICP) algorithm. This is for me to be able to explore a topic that I
+find interesting while also furthering my experience in C++.
 
 ## Project Progress
 
 ### Completed:
 
-- Setup CMake and Catch2 to build the project and it's associated test suite.
+- Setup CMake and Catch2 to build the project and its associated test suite.
 - Designed and implemented custom Point and PointCloud data structures.
 - Integrated TinyPly to enable reading and writing the PLY file format.
 - Defined my KD-tree API and implemented KD-tree construction.
@@ -21,6 +21,8 @@ find interesting, but I do try to keep it fairly well documented.
 - Implement ICP algorithm (Will start with a simple point-to-point approach)
 - Begin making some examples with cool visualizations.
 - Tons of benchmarking and optimization improvements to be made!
+- Explore robustness techniques to be used in the ICP algorithm.
+
 ## Performance
 
 The following table shows the performance of the KD-Tree and Brute Force implementations for the KNN and Radius Search
@@ -35,12 +37,12 @@ the Kd-Tree implementations are a much better approach than naive methods.
 
 ## Building the Project
 
-To build this project I am using CMake as my build system and Catch2 as my testing framework. This is mostly just
-because they are the tools that I am already familiar with and I want to focus on the cool stuff.
+To build this project, I am using CMake as my build system and Catch2 as my testing framework. This is mostly just
+because they are the tools that I am already familiar with, and I want to focus on the cool stuff.
 
 Currently, there is no grand application for explorers to play with, but it will be coming eventually.
 
-If you want build the test suite you can the do the following from the project base directory:
+If you want to build the test suite, you can do the following from the project base directory:
 
 ```
 mkdir build
