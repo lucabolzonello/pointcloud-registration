@@ -51,6 +51,9 @@ include(Sanitizers)
 include(CompilerWarnings)
 include(FetchDependencies)
 
+# fetches of core libraries (stuff that every facet of project will use)
+fetch_eigen()
+
 
 # =========================
 # Core library
