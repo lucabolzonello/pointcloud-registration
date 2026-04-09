@@ -50,7 +50,7 @@ void brute_force_radius(const pcr::core::PointCloud &cloud,
     pcr::dist_t dz = point.z - query.z;
     pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
 
-    if (dist_sq <= radius_sq) {
+    if (dist_sq < radius_sq) {
       distances.push_back(dist_sq);
       indices.push_back(i);
     }
