@@ -12,33 +12,45 @@
 // Helper to create a simple test cloud
 pcr::core::PointCloud create_test_cloud() {
   pcr::core::PointCloud cloud;
-  cloud.add({static_cast<pcr::coord_t>(1.2), static_cast<pcr::coord_t>(29.1),
-             static_cast<pcr::coord_t>(10.0)});
-  cloud.add({static_cast<pcr::coord_t>(4.4), static_cast<pcr::coord_t>(29.0),
-             static_cast<pcr::coord_t>(15.5)});
-  cloud.add({static_cast<pcr::coord_t>(4.5), static_cast<pcr::coord_t>(28.8),
-             static_cast<pcr::coord_t>(16.0)});
-  cloud.add({static_cast<pcr::coord_t>(21.2), static_cast<pcr::coord_t>(19.0),
-             static_cast<pcr::coord_t>(12.0)});
-  cloud.add({static_cast<pcr::coord_t>(36.2), static_cast<pcr::coord_t>(669.0),
-             static_cast<pcr::coord_t>(21.0)});
-  cloud.add({static_cast<pcr::coord_t>(56.8), static_cast<pcr::coord_t>(8093.0),
-             static_cast<pcr::coord_t>(10.0)});
-  cloud.add({static_cast<pcr::coord_t>(59.7), static_cast<pcr::coord_t>(8090.0),
-             static_cast<pcr::coord_t>(-10.0)});
-  cloud.add({static_cast<pcr::coord_t>(9.0), static_cast<pcr::coord_t>(9.0),
-             static_cast<pcr::coord_t>(10.0)});
-  cloud.add({static_cast<pcr::coord_t>(-10.0), static_cast<pcr::coord_t>(43.0),
-             static_cast<pcr::coord_t>(10.0)});
-  cloud.add({static_cast<pcr::coord_t>(-90.2), static_cast<pcr::coord_t>(-20.0),
-             static_cast<pcr::coord_t>(-100.0)});
-  cloud.add({static_cast<pcr::coord_t>(-90.0), static_cast<pcr::coord_t>(-21.5),
-             static_cast<pcr::coord_t>(-100.8)});
-  cloud.add({static_cast<pcr::coord_t>(5.78), static_cast<pcr::coord_t>(56.2),
-             static_cast<pcr::coord_t>(20.0)});
-  cloud.add({static_cast<pcr::coord_t>(100.2),
-             static_cast<pcr::coord_t>(-100.0),
-             static_cast<pcr::coord_t>(25.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(1.2),
+                   static_cast<pcr::coord_t>(29.1),
+                   static_cast<pcr::coord_t>(10.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(4.4),
+                   static_cast<pcr::coord_t>(29.0),
+                   static_cast<pcr::coord_t>(15.5)});
+  cloud.push_back({static_cast<pcr::coord_t>(4.5),
+                   static_cast<pcr::coord_t>(28.8),
+                   static_cast<pcr::coord_t>(16.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(21.2),
+                   static_cast<pcr::coord_t>(19.0),
+                   static_cast<pcr::coord_t>(12.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(36.2),
+                   static_cast<pcr::coord_t>(669.0),
+                   static_cast<pcr::coord_t>(21.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(56.8),
+                   static_cast<pcr::coord_t>(8093.0),
+                   static_cast<pcr::coord_t>(10.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(59.7),
+                   static_cast<pcr::coord_t>(8090.0),
+                   static_cast<pcr::coord_t>(-10.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(9.0),
+                   static_cast<pcr::coord_t>(9.0),
+                   static_cast<pcr::coord_t>(10.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(-10.0),
+                   static_cast<pcr::coord_t>(43.0),
+                   static_cast<pcr::coord_t>(10.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(-90.2),
+                   static_cast<pcr::coord_t>(-20.0),
+                   static_cast<pcr::coord_t>(-100.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(-90.0),
+                   static_cast<pcr::coord_t>(-21.5),
+                   static_cast<pcr::coord_t>(-100.8)});
+  cloud.push_back({static_cast<pcr::coord_t>(5.78),
+                   static_cast<pcr::coord_t>(56.2),
+                   static_cast<pcr::coord_t>(20.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(100.2),
+                   static_cast<pcr::coord_t>(-100.0),
+                   static_cast<pcr::coord_t>(25.0)});
 
   return cloud;
 }

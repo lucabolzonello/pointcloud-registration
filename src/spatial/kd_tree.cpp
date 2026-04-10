@@ -82,7 +82,7 @@ void KdTree::knn_search(const pcr::point_t &query_point, pcr::point_idx k,
 
   // perform recursive search
   knn_search_rec(query_point, k, 0, m_point_cloud_size,
-                 0, m_point_cloud->get_bounding_box(),
+                 0, pcr::core::BoundingBox<pcr::coord_t>(),
                  result_heap);
 
   // Grab from the result heap and place in out_indices_and_distances_squared
@@ -148,7 +148,6 @@ void KdTree::knn_search_rec(const pcr::point_t &query_point, pcr::point_idx k,
     nearer_bb.split(false, split_dim, split_value);
     farther_bb.split(true, split_dim, split_value);
   }
-
   split_dim = (split_dim + 1) % 3;
 
   // Recurse near-side
@@ -171,8 +170,9 @@ void KdTree::radius_search(
     std::vector<pcr::point_idx> &out_indices,
     std::vector<pcr::dist_t> &out_distances_squared) const {
   // perform recursive search
+
   radius_search_rec(query_point, radius * radius, 0, m_point_cloud_size, 0,
-                    m_point_cloud->get_bounding_box(),
+                    pcr::core::BoundingBox<pcr::coord_t>(),
                     out_indices, out_distances_squared);
 
 }

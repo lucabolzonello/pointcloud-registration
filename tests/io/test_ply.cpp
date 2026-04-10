@@ -8,20 +8,25 @@
 TEST_CASE("PLY write/read round-trip preserves points", "[ply]") {
   pcr::core::PointCloud cloud;
 
-  cloud.add({static_cast<pcr::coord_t>(1.0), static_cast<pcr::coord_t>(2.0),
-             static_cast<pcr::coord_t>(3.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(1.0),
+                   static_cast<pcr::coord_t>(2.0),
+                   static_cast<pcr::coord_t>(3.0)});
 
-  cloud.add({static_cast<pcr::coord_t>(-1.5), static_cast<pcr::coord_t>(0.0),
-             static_cast<pcr::coord_t>(4.2)});
+  cloud.push_back({static_cast<pcr::coord_t>(-1.5),
+                   static_cast<pcr::coord_t>(0.0),
+                   static_cast<pcr::coord_t>(4.2)});
 
-  cloud.add({static_cast<pcr::coord_t>(10.0), static_cast<pcr::coord_t>(20.0),
-             static_cast<pcr::coord_t>(30.0)});
+  cloud.push_back({static_cast<pcr::coord_t>(10.0),
+                   static_cast<pcr::coord_t>(20.0),
+                   static_cast<pcr::coord_t>(30.0)});
 
-  cloud.add({static_cast<pcr::coord_t>(-10.5), static_cast<pcr::coord_t>(65.2),
-             static_cast<pcr::coord_t>(32.1)});
+  cloud.push_back({static_cast<pcr::coord_t>(-10.5),
+                   static_cast<pcr::coord_t>(65.2),
+                   static_cast<pcr::coord_t>(32.1)});
 
-  cloud.add({static_cast<pcr::coord_t>(-10.3), static_cast<pcr::coord_t>(65.2),
-             static_cast<pcr::coord_t>(32.1)});
+  cloud.push_back({static_cast<pcr::coord_t>(-10.3),
+                   static_cast<pcr::coord_t>(65.2),
+                   static_cast<pcr::coord_t>(32.1)});
 
   const auto path = std::filesystem::temp_directory_path() / "pcr_test_cloud";
 
