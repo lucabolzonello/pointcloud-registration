@@ -86,9 +86,9 @@ void write_file(const std::string &path_to_file,
   std::vector<pcr::coord_t> vertex_buffer;
   vertex_buffer.reserve(src_point_cloud.size() * 3);
   for (const auto &point : src_point_cloud) {
-    vertex_buffer.push_back(point.x);
-    vertex_buffer.push_back(point.y);
-    vertex_buffer.push_back(point.z);
+    vertex_buffer.push_back(point.x());
+    vertex_buffer.push_back(point.y());
+    vertex_buffer.push_back(point.z());
   }
 
   // Use tinyply API to write vertex_buffer to the outstream

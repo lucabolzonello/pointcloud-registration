@@ -47,9 +47,9 @@ void brute_force_radius(const pcr::core::PointCloud &cloud,
   pcr::dist_t radius_sq = radius * radius;
   for (size_t i = 0; i < cloud.size(); ++i) {
     const auto &point = cloud[i];
-    pcr::dist_t dx = point.x - query.x;
-    pcr::dist_t dy = point.y - query.y;
-    pcr::dist_t dz = point.z - query.z;
+    pcr::dist_t dx = point.x() - query.x();
+    pcr::dist_t dy = point.y() - query.y();
+    pcr::dist_t dz = point.z() - query.z();
     pcr::dist_t dist_sq = dx * dx + dy * dy + dz * dz;
 
     if (dist_sq <= radius_sq) {

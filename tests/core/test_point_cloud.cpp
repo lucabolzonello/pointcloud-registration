@@ -13,7 +13,7 @@
 template <typename T>
 bool are_points_equal(const pcr::core::Point<T> &lhs,
                       const pcr::core::Point<T> &rhs) {
-  return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+  return lhs.x() == rhs.x() && lhs.y() == rhs.y() && lhs.z() == rhs.z();
 }
 
 using point_value_type = pcr::coord_t;

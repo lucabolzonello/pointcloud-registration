@@ -42,9 +42,9 @@ TEST_CASE("PLY write/read round-trip preserves points", "[ply]") {
     auto it2 = loaded.begin();
 
     for (; it1 != cloud.end(); ++it1, ++it2) {
-      CHECK_THAT(it1->x, Catch::Matchers::WithinRel(it2->x));
-      CHECK_THAT(it1->y, Catch::Matchers::WithinRel(it2->y));
-      CHECK_THAT(it1->z, Catch::Matchers::WithinRel(it2->z));
+      CHECK_THAT(it1->x(), Catch::Matchers::WithinRel(it2->x()));
+      CHECK_THAT(it1->y(), Catch::Matchers::WithinRel(it2->y()));
+      CHECK_THAT(it1->z(), Catch::Matchers::WithinRel(it2->z()));
     }
   }
 
@@ -59,9 +59,9 @@ TEST_CASE("PLY write/read round-trip preserves points", "[ply]") {
     auto it2 = loaded.begin();
 
     for (; it1 != cloud.end(); ++it1, ++it2) {
-      CHECK_THAT(it1->x, Catch::Matchers::WithinRel(it2->x));
-      CHECK_THAT(it1->y, Catch::Matchers::WithinRel(it2->y));
-      CHECK_THAT(it1->z, Catch::Matchers::WithinRel(it2->z));
+      CHECK_THAT(it1->x(), Catch::Matchers::WithinRel(it2->x()));
+      CHECK_THAT(it1->y(), Catch::Matchers::WithinRel(it2->y()));
+      CHECK_THAT(it1->z(), Catch::Matchers::WithinRel(it2->z()));
     }
   }
 

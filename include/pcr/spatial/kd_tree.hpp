@@ -168,36 +168,14 @@ private:
   split_val(const pcr::point_t &query_point, uint8_t split_dimension) {
     switch (split_dimension) {
     case 0:
-      return query_point.x;
+      return query_point.x();
 
     case 1:
-      return query_point.y;
+      return query_point.y();
 
     default:
-      return query_point.z;
+      return query_point.z();
     }
-  }
-
-  /**
-   * @brief Get index of left child node
-   *
-   * @param curr_node_idx Index of current node
-   * @return Index of left child in tree array
-   */
-  [[nodiscard]] static inline pcr::point_idx
-  left_node(pcr::point_idx curr_node_idx) {
-    return 2 * curr_node_idx + 1;
-  }
-
-  /**
-   * @brief Get index of right child node
-   *
-   * @param curr_node_idx Index of current node
-   * @return Index of right child in tree array
-   */
-  [[nodiscard]] static inline pcr::point_idx
-  right_node(pcr::point_idx curr_node_idx) {
-    return 2 * curr_node_idx + 2;
   }
 
   /**
@@ -245,9 +223,9 @@ private:
    */
   [[nodiscard]] static inline pcr::dist_t
   get_dist_squared(const pcr::point_t &p1, const pcr::point_t &p2) {
-    pcr::dist_t x_diff = p1.x - p2.x;
-    pcr::dist_t y_diff = p1.y - p2.y;
-    pcr::dist_t z_diff = p1.z - p2.z;
+    pcr::dist_t x_diff = p1.x() - p2.x();
+    pcr::dist_t y_diff = p1.y() - p2.y();
+    pcr::dist_t z_diff = p1.z() - p2.z();
 
     pcr::dist_t dist_squared =
         (x_diff * x_diff) + (y_diff * y_diff) + (z_diff * z_diff);
@@ -270,15 +248,20 @@ private:
                    const core::BoundingBox<float> &bounding_box) {
     // Compute by coordinate clamping
     pcr::coord_t dx =
-        query_point.x - std::max(bounding_box.min_x,
-                                 std::min(query_point.x, bounding_box.max_x));
+        query_point.x() - std::max(bounding_box.min_x,
+                                   std::min(query_point.x(),
+                                            bounding_box.max_x));
     pcr::coord_t dy =
-        query_point.y - std::max(bounding_box.min_y,
-                                 std::min(query_point.y, bounding_box.max_y));
+        query_point.y() - std::max(bounding_box.min_y,
+                                   std::min(query_point.y(),
+                                            bounding_box.max_y));
     pcr::coord_t dz =
         query_point.z - std::max(bounding_box.min_z,
                                  std::min(query_point.z, bounding_box.max_z));
 
+        query_point.z() - std::max(bounding_box.min_z,
+                                   std::min(query_point.z(),
+                                            bounding_box.max_z));
     return dx * dx + dy * dy + dz * dz;
   }
 
