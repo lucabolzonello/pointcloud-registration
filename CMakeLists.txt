@@ -80,6 +80,8 @@ target_include_directories(pcr
         $<INSTALL_INTERFACE:include>
 )
 
+target_link_libraries(pcr PRIVATE Eigen3::Eigen)
+
 # Set compilation warnings
 set_project_warnings(pcr)
 

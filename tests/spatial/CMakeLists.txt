@@ -10,6 +10,7 @@ set_project_warnings(test_kd_tree)
 target_link_libraries(test_kd_tree
         PRIVATE
         Catch2::Catch2WithMain
+        Eigen3::Eigen
 )
 
 add_test(ctest_kd_tree test_kd_tree)
@@ -24,6 +25,7 @@ set_project_warnings(test_kd_tree_brute)
 target_link_libraries(test_kd_tree_brute
         PRIVATE
         Catch2::Catch2WithMain
+        Eigen3::Eigen
 )
 
 add_test(ctest_kd_tree_brute test_kd_tree_brute) # Not sure if I should be officially registering as a test or not (because it is really slow)

@@ -9,6 +9,7 @@ set_project_warnings(test_point)
 target_link_libraries(test_point
         PRIVATE
         Catch2::Catch2WithMain
+        Eigen3::Eigen
 )
 
 add_test(ctest_point test_point)
@@ -20,6 +21,7 @@ set_project_warnings(test_point_cloud)
 target_link_libraries(test_point_cloud
         PRIVATE
         Catch2::Catch2WithMain
+        Eigen3::Eigen
 )
 
 add_test(ctest_point_cloud test_point_cloud)

@@ -6,7 +6,7 @@ function(pcr_add_benchmark TARGET_NAME)
     target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
     # Add pcr library
-    target_link_libraries(${TARGET_NAME} PRIVATE pcr benchmark::benchmark)
+    target_link_libraries(${TARGET_NAME} PRIVATE pcr benchmark::benchmark Eigen3::Eigen)
 
 
     # Set project warnings
