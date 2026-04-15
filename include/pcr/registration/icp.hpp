@@ -29,7 +29,7 @@ struct IcpResult {
   pcr::coord_t final_error = 0; ///< Final error of the registration
   std::size_t iterations = 0; ///< Number of iterations executed
   bool converged = false; ///< Whether the algorithm converged
-  Eigen::Matrix4<pcr::coord_t> transform;
+  pcr::transform_t transform;
   ///< Final transformation matrix for the Rigid Body Transform
 };
 

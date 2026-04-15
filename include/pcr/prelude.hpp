@@ -6,7 +6,7 @@
 #define PRELUDE_HPP
 #include <cstdint>
 #include <type_traits>
-
+#include <Eigen/Dense>
 #include "pcr/core/point.hpp"
 
 /**
@@ -52,6 +52,8 @@ static_assert(std::is_floating_point_v<coord_t>);
 // Distance type must be floating point (float, double, long double)
 static_assert(std::is_floating_point_v<dist_t>);
 
+using transform_t = Eigen::Transform<coord_t, 3, Eigen::Affine>;
+///< Transformation matrix type
 } // namespace pcr
 
 #endif // PRELUDE_HPP
