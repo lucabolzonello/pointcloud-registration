@@ -256,12 +256,10 @@ private:
                                    std::min(query_point.y(),
                                             bounding_box.max_y));
     pcr::coord_t dz =
-        query_point.z - std::max(bounding_box.min_z,
-                                 std::min(query_point.z, bounding_box.max_z));
-
         query_point.z() - std::max(bounding_box.min_z,
                                    std::min(query_point.z(),
                                             bounding_box.max_z));
+    asm("# end get dist squared");
     return dx * dx + dy * dy + dz * dz;
   }
 

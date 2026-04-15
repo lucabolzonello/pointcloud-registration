@@ -52,32 +52,75 @@ TEST_CASE("Point coordinates can be modified", "[member access]") {
   }
 }
 
-TEST_CASE("Operator== overload works", "[equivalency overload]") {
+TEST_CASE("Operator+= overload adds coordinates from another point",
+          "[overload]") {
   auto x_value = static_cast<pcr::coord_t>(1);
   auto y_value = static_cast<pcr::coord_t>(2);
   auto z_value = static_cast<pcr::coord_t>(3);
 
-  SECTION("Points equivalent") {
+  pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
+  pcr::core::Point<pcr::coord_t> p2(x_value, y_value, z_value);
 
-    pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
-    pcr::core::Point<pcr::coord_t> p2(x_value, y_value, z_value);
-  }
+  p1 += p2;
 
-  SECTION("Different X value") {
-
-    pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
-    pcr::core::Point<pcr::coord_t> p2(y_value, y_value, z_value);
-  }
-
-  SECTION("Different Y value") {
-
-    pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
-    pcr::core::Point<pcr::coord_t> p2(x_value, z_value, z_value);
-  }
-
-  SECTION("Different Z value") {
-
-    pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
-    pcr::core::Point<pcr::coord_t> p2(x_value, y_value, x_value);
-  }
+  CHECK(p1.x() == static_cast<pcr::coord_t>(2));
+  CHECK(p1.y() == static_cast<pcr::coord_t>(4));
+  CHECK(p1.z() == static_cast<pcr::coord_t>(6));
 }
+
+TEST_CASE("Operator+ overload returns a new summed point",
+          "[overload]") {
+  auto x_value = static_cast<pcr::coord_t>(1);
+  auto y_value = static_cast<pcr::coord_t>(2);
+  auto z_value = static_cast<pcr::coord_t>(3);
+
+  pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
+  pcr::core::Point<pcr::coord_t> p2(x_value, y_value, z_value);
+
+  auto p3 = p1 + p2;
+
+  CHECK(p1.x() == x_value);
+  CHECK(p1.y() == y_value);
+  CHECK(p1.z() == z_value);
+
+  CHECK(p3.x() == static_cast<pcr::coord_t>(2));
+  CHECK(p3.y() == static_cast<pcr::coord_t>(4));
+  CHECK(p3.z() == static_cast<pcr::coord_t>(6));
+}
+
+TEST_CASE("Operator/= overload divides coordinates by a scalar",
+          "[overload]") {
+  auto x_value = static_cast<pcr::coord_t>(2);
+  auto y_value = static_cast<pcr::coord_t>(4);
+  auto z_value = static_cast<pcr::coord_t>(6);
+
+  pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
+
+  auto divisor = static_cast<pcr::coord_t>(2);
+  p1 /= divisor;
+
+  CHECK(p1.x() == static_cast<pcr::coord_t>(1));
+  CHECK(p1.y() == static_cast<pcr::coord_t>(2));
+  CHECK(p1.z() == static_cast<pcr::coord_t>(3));
+}
+
+TEST_CASE("Operator/ overload returns a new divided point",
+          "[overload]") {
+  auto x_value = static_cast<pcr::coord_t>(2);
+  auto y_value = static_cast<pcr::coord_t>(4);
+  auto z_value = static_cast<pcr::coord_t>(6);
+
+  pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
+
+  auto divisor = static_cast<pcr::coord_t>(2);
+  auto p2 = p1 / divisor;
+
+  CHECK(p1.x() == x_value);
+  CHECK(p1.y() == y_value);
+  CHECK(p1.z() == z_value);
+
+  CHECK(p2.x() == static_cast<pcr::coord_t>(1));
+  CHECK(p2.y() == static_cast<pcr::coord_t>(2));
+  CHECK(p2.z() == static_cast<pcr::coord_t>(3));
+}
+
