@@ -79,6 +79,15 @@ public:
   */
   CoordType &z() noexcept { return coords[2]; }
 
+  /**
+    *@brief Transforms the point by the given transformation matrix
+    *@param transform Transformation parameter of type transform_t in prelude
+   */
+  template <typename T>
+  void transform(T transform) {
+    coords = transform * coords;
+  }
+
 
   /**
    * @brief Operator overload for addition assignment with another point

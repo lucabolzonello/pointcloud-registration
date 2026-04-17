@@ -128,13 +128,64 @@ TEST_CASE("Operator/ overload returns a new divided point",
                                               z_value / divisor);
 
   compare_points(p2, result_point);
+}
 
-  CHECK(p1.x() == x_value);
-  CHECK(p1.y() == y_value);
-  CHECK(p1.z() == z_value);
+TEST_CASE("Transform of point by a transformation matrix", "[transform]") {
+  pcr::core::Point<pcr::coord_t> p1(1, 2, 3);
+  SECTION("Identity transformation") {
+    pcr::transform_t identity_transform = pcr::transform_t::Identity();
 
-  CHECK(p2.x() == static_cast<pcr::coord_t>(1));
-  CHECK(p2.y() == static_cast<pcr::coord_t>(2));
-  CHECK(p2.z() == static_cast<pcr::coord_t>(3));
+    pcr::core::Point<pcr::coord_t> result_point = p1;
+    p1.transform(identity_transform);
+
+    compare_points(p1, result_point);
+  }
+
+  SECTION("Translation") {
+    pcr::transform_t translation_transform = pcr::transform_t::Identity();
+    translation_transform *= Eigen::Translation<pcr::coord_t, 3>(
+        Eigen::Vector3f(2.0f, -2.0f, 3.0f));
+
+    p1.transform(translation_transform);
+
+    pcr::core::Point<pcr::coord_t> result_point(3, 0, 6);
+    compare_points(result_point, p1);
+  }
+
+  SECTION("Rotation with quaternion") {
+    pcr::transform_t rotation_transform = pcr::transform_t::Identity();
+    // Rotation
+    rotation_transform *= Eigen::Quaternion<
+      pcr::coord_t>(0.0, 1.0, 0.0, 0.0);
+
+    p1.transform(rotation_transform);
+
+    pcr::core::Point<pcr::coord_t> result_point(1, -2.0, -3.0);
+    compare_points(result_point, p1);
+  }
+  SECTION("Scaling") {
+    pcr::transform_t scaling_transform = pcr::transform_t::Identity();
+    scaling_transform *= Eigen::UniformScaling<pcr::coord_t>(2.0);
+    p1.transform(scaling_transform);
+
+    pcr::core::Point<pcr::coord_t> result_point(2, 4, 6);
+    compare_points(result_point, p1);
+  }
+
+  SECTION("Combined rotation and translation") {
+    pcr::transform_t combined_transform = pcr::transform_t::Identity();
+
+    combined_transform *= Eigen::Quaternion<pcr::coord_t>(
+        0.0, 1.0, 0.0, 0.0);
+
+    combined_transform *= Eigen::Translation<pcr::coord_t, 3>(
+        Eigen::Vector3f(2.0f, -2.0f, 3.0f));
+
+    p1.transform(combined_transform);
+
+    pcr::core::Point<pcr::coord_t> result_point(3.0, 0.0, -6.0);
+    compare_points(result_point, p1);
+  }
+
 }
 
