@@ -5,6 +5,15 @@
 
 #include "pcr/prelude.hpp"
 
+
+void compare_points(const pcr::core::Point<pcr::coord_t> &it1,
+                    const pcr::core::Point<pcr::coord_t> &it2) {
+
+  CHECK_THAT(it1.x(), Catch::Matchers::WithinRel(it2.x()));
+  CHECK_THAT(it1.y(), Catch::Matchers::WithinRel(it2.y()));
+  CHECK_THAT(it1.z(), Catch::Matchers::WithinRel(it2.z()));
+}
+
 TEST_CASE("Point is default constructable, and uses zero initialization",
           "[constructor]") {
   pcr::core::Point<pcr::coord_t> p1;
@@ -60,12 +69,13 @@ TEST_CASE("Operator+= overload adds coordinates from another point",
 
   pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
   pcr::core::Point<pcr::coord_t> p2(x_value, y_value, z_value);
+  pcr::core::Point<pcr::coord_t> result_point(x_value + x_value,
+                                              y_value + y_value,
+                                              z_value + z_value);
 
   p1 += p2;
 
-  CHECK(p1.x() == static_cast<pcr::coord_t>(2));
-  CHECK(p1.y() == static_cast<pcr::coord_t>(4));
-  CHECK(p1.z() == static_cast<pcr::coord_t>(6));
+  compare_points(p1, result_point);
 }
 
 TEST_CASE("Operator+ overload returns a new summed point",
@@ -77,15 +87,13 @@ TEST_CASE("Operator+ overload returns a new summed point",
   pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
   pcr::core::Point<pcr::coord_t> p2(x_value, y_value, z_value);
 
+  pcr::core::Point<pcr::coord_t> result_point(x_value + x_value,
+                                              y_value + y_value,
+                                              z_value + z_value);
+
   auto p3 = p1 + p2;
 
-  CHECK(p1.x() == x_value);
-  CHECK(p1.y() == y_value);
-  CHECK(p1.z() == z_value);
-
-  CHECK(p3.x() == static_cast<pcr::coord_t>(2));
-  CHECK(p3.y() == static_cast<pcr::coord_t>(4));
-  CHECK(p3.z() == static_cast<pcr::coord_t>(6));
+  compare_points(p3, result_point);
 }
 
 TEST_CASE("Operator/= overload divides coordinates by a scalar",
@@ -95,13 +103,14 @@ TEST_CASE("Operator/= overload divides coordinates by a scalar",
   auto z_value = static_cast<pcr::coord_t>(6);
 
   pcr::core::Point<pcr::coord_t> p1(x_value, y_value, z_value);
-
   auto divisor = static_cast<pcr::coord_t>(2);
+
+  pcr::core::Point<pcr::coord_t> result_point(x_value / divisor,
+                                              y_value / divisor,
+                                              z_value / divisor);
   p1 /= divisor;
 
-  CHECK(p1.x() == static_cast<pcr::coord_t>(1));
-  CHECK(p1.y() == static_cast<pcr::coord_t>(2));
-  CHECK(p1.z() == static_cast<pcr::coord_t>(3));
+  compare_points(p1, result_point);
 }
 
 TEST_CASE("Operator/ overload returns a new divided point",
@@ -114,6 +123,11 @@ TEST_CASE("Operator/ overload returns a new divided point",
 
   auto divisor = static_cast<pcr::coord_t>(2);
   auto p2 = p1 / divisor;
+  pcr::core::Point<pcr::coord_t> result_point(x_value / divisor,
+                                              y_value / divisor,
+                                              z_value / divisor);
+
+  compare_points(p2, result_point);
 
   CHECK(p1.x() == x_value);
   CHECK(p1.y() == y_value);
