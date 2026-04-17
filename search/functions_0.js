@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['boundingbox_0',['boundingbox',['../structpcr_1_1core_1_1BoundingBox.html#ad4b8094e7718e0ffd1da36a5ae5e208c',1,'pcr::core::BoundingBox::BoundingBox()'],['../structpcr_1_1core_1_1BoundingBox.html#a44b0627e51d54a0ca1d4dcf3922fab45',1,'pcr::core::BoundingBox::BoundingBox(const BoundingBox &amp;other)=default']]],
+  ['build_5findex_1',['build_index',['../classpcr_1_1spatial_1_1KdTree.html#ae852f03022b365b6adff70f46a9bd837',1,'pcr::spatial::KdTree']]]
+];
